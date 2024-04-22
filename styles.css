@@ -84,3 +84,42 @@ h1 {
     margin-top: 10px;
   }
 }
+
+
+
+/* Existing styles... */
+
+/* Volume slider icon */
+.volume-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px; /* Adjust icon position */
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  color: #280cff;
+}
+
+/* Video speed controls and remove button */
+.video-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.video-speed-wrapper {
+  flex-grow: 1; /* Expand to fill available space */
+}
+
+.remove-btn {
+  padding: 5px 10px;
+  border: none;
+  background-color: #ff6347; /* Red color for remove button */
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background-color: #cc4b39; /* Darker red color on hover */
+}
