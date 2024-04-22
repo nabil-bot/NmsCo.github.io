@@ -124,3 +124,19 @@ function setVolume(videoWrapper, volume) {
 
 // Add event listener for "Add Video" button
 document.getElementById('add-video-btn').addEventListener('click', addVideo);
+
+
+
+// Function to paste clipboard content into the input field
+function pasteFromClipboard() {
+  navigator.clipboard.readText()
+    .then(text => {
+      document.getElementById('video-url').value = text.trim();
+    })
+    .catch(err => {
+      console.error('Failed to read clipboard contents: ', err);
+    });
+}
+
+// Add event listener for "Paste" button
+document.getElementById('paste-btn').addEventListener('click', pasteFromClipboard);

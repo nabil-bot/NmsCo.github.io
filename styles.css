@@ -1,22 +1,35 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #333;
+  color: #fff;
   padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
 }
 
 #videos-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .video-wrapper {
   margin: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
 }
 
 .video-wrapper iframe {
-  border: none;
+  width: 100%;
 }
 
 .input-group {
@@ -25,4 +38,49 @@ body {
 
 .slider {
   width: 100%;
+}
+
+#controls {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#controls input[type="text"] {
+  width: calc(100% - 42px); /* Subtract the width of buttons and their margins */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+#controls button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#controls button:hover {
+  background-color: #0056b3;
+}
+
+/* Media queries for responsiveness */
+@media screen and (max-width: 600px) {
+  #controls {
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center elements horizontally */
+  }
+
+  #controls input[type="text"] {
+    width: calc(100% - 20px); /* Adjust width to fit the container */
+    margin-right: 0;
+  }
+
+  #controls button {
+    width: calc(100% - 20px); /* Adjust width to fit the container */
+    margin-top: 10px;
+  }
 }
