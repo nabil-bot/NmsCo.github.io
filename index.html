@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Video Player</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="videos-container">
+    <!-- Videos will be dynamically added here -->
+  </div>
+  <div id="controls">
+    <div class="input-group">
+      <input type="text" id="video-url1" placeholder="Enter Video URL 1">
+      <button onclick="addVideo(1)">Add Video 1</button>
+      <input type="range" min="0" max="100" value="100" class="slider" id="volume1" onchange="setVolume(1)">
+    </div>
+    <div class="input-group">
+      <input type="text" id="video-url2" placeholder="Enter Video URL 2">
+      <button onclick="addVideo(2)">Add Video 2</button>
+      <input type="range" min="0" max="100" value="100" class="slider" id="volume2" onchange="setVolume(2)">
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
