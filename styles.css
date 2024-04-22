@@ -1,16 +1,28 @@
-/* Add your CSS styles here */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
 #videos-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  
-  .input-group {
-    margin-bottom: 10px;
-  }
-  
-  .slider {
-    width: 100%;
-  }
-  
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.video-wrapper {
+  margin: 10px;
+}
+
+.video-wrapper iframe {
+  border: none;
+}
+
+.input-group {
+  margin-bottom: 10px;
+}
+
+.slider {
+  width: 100%;
+}
