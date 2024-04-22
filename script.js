@@ -15,14 +15,25 @@ function addVideoPlayer(videoId, volume) {
     iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
     iframe.allowFullscreen = true;
   
-    // Set the volume
-    iframe.volume = volume;
-  
     // Append the iframe to the video wrapper
     videoWrapper.appendChild(iframe);
   
     // Append the video wrapper to the videos container
     videosContainer.appendChild(videoWrapper);
+  
+    // Initialize the YouTube iframe API for the video
+    initializeYouTubeAPI(iframe, volume);
+  }
+  
+  // Function to initialize the YouTube iframe API for a video
+  function initializeYouTubeAPI(iframe, volume) {
+    const player = new YT.Player(iframe, {
+      events: {
+        'onReady': function (event) {
+          event.target.setVolume(volume); // Set volume (0-100)
+        }
+      }
+    });
   }
   
   // Function to add a new video
@@ -31,7 +42,7 @@ function addVideoPlayer(videoId, volume) {
     const volumeSlider = document.getElementById(`volume${videoNumber}`);
   
     const videoUrl = videoUrlInput.value.trim();
-    const volume = volumeSlider.value / 100;
+    const volume = volumeSlider.value; // Volume should be in the range of 0 to 100
   
     // Check if the input is empty
     if (videoUrl === '') {
@@ -60,6 +71,14 @@ function addVideoPlayer(videoId, volume) {
     const volumeSlider = document.getElementById(`volume${videoNumber}`);
     const videoFrames = document.querySelectorAll('iframe');
   
-    videoFrames[videoNumber - 1].volume = volumeSlider.value / 100;
+    // Retrieve the YouTube player instance
+    const player = videoFrames[videoNumber - 1].contentWindow;
+  
+    // Set the volume using the YouTube API
+    player.postMessage(JSON.stringify({
+      'event': 'command',
+      'func': 'setVolume',
+      'args': [volumeSlider.value]
+    }), '*');
   }
   
