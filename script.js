@@ -141,13 +141,6 @@ function initializeYouTubeAPI(iframe, volume) {
     }
   });
 
-  const suggestionsContainer = iframe.nextElementSibling;
-  suggestionsContainer.addEventListener('click', function (event) {
-    if (event.target.tagName === 'A') {
-      event.preventDefault(); // Prevent default action of clicking on video suggestion
-      player.loadVideoById(getVideoIdFromUrl(event.target.href));
-    }
-  });
 }
 
 function getVideoIdFromUrl(url) {
