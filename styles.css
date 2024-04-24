@@ -80,7 +80,7 @@ h1 {
   }
 
   #controls button {
-    width: calc(30% - 20px); /* Adjust width to fit the container */
+    width: calc(50% - 20px); /* Adjust width to fit the container */
     margin-top: 10px;
   }
 }
