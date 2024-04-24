@@ -21,24 +21,35 @@ function addVideoPlayer(videoId, volume, speed) {
   // Append the iframe to the video wrapper
   videoWrapper.appendChild(iframe);
 
-  // Create a volume slider
-  const volumeSlider = document.createElement('input');
-  volumeSlider.type = 'range';
-  volumeSlider.min = 0;
-  volumeSlider.max = 100;
-  volumeSlider.value = volume * 100;
-  volumeSlider.classList.add('slider');
+
+  // Create volume container
+const volumeContainer = document.createElement('div');
+volumeContainer.classList.add('volume-container');
+
+// Create speaker icon
+const speakerIcon = document.createElement('i');
+speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
+
+
+// Append speaker icon and volume slider to volume container
+volumeContainer.appendChild(speakerIcon);
+
+// Create volume slider
+const volumeSlider = document.createElement('input');
+volumeSlider.type = 'range';
+volumeSlider.min = 0;
+volumeSlider.max = 100;
+volumeSlider.value = volume * 100;
+volumeSlider.classList.add('slider');
+
+volumeContainer.appendChild(volumeSlider);
+
+// Append volume container to the video wrapper
+videoWrapper.appendChild(volumeContainer);
+
   volumeSlider.addEventListener('input', function () {
     setVolume(videoWrapper, volumeSlider.value);
   });
-
-  // Append volume icon
-  // const volumeIcon = document.createElement('i');
-  // volumeIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
-  // videoWrapper.appendChild(volumeIcon);
-
-  // Append the volume slider to the video wrapper
-  videoWrapper.appendChild(volumeSlider);
 
   // Create video speed controls and remove button wrapper
   const videoControlsWrapper = document.createElement('div');
@@ -94,12 +105,18 @@ function addVideoPlayer(videoId, volume, speed) {
 }
 
 // Function to initialize the YouTube iframe API for a video
+// Function to initialize the YouTube iframe API for a video
 function initializeYouTubeAPI(iframe, volume) {
   const player = new YT.Player(iframe, {
     events: {
       'onReady': function (event) {
         event.target.setVolume(volume * 100); // Set volume (0-100)
         players.push(event.target); // Add player instance to the array
+      },
+      'onStateChange': function (event) {
+        if (event.data === YT.PlayerState.ENDED) {
+          event.target.stopVideo();
+        }
       }
     }
   });
@@ -107,12 +124,38 @@ function initializeYouTubeAPI(iframe, volume) {
   // Pause/Play video when visibility of the page changes
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {
-      players.forEach(player => player.playVideo());
-    } else {
-      players.forEach(player => player.pauseVideo());
+      players.forEach(player => {
+        // Check if the player's state is "playing"
+        if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+          player.playVideo(); // Resume playback if the player was playing
+        }
+      });
+    } 
+    else {
+      players.forEach(player => {
+        // Check if the player's state is "playing"
+        if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+          player.playVideo(); // Resume playback if the player was playing
+        }
+      });
+    }
+  });
+
+
+  const suggestionsContainer = iframe.nextElementSibling;
+  suggestionsContainer.addEventListener('click', function (event) {
+    if (event.target.tagName === 'A') {
+      event.preventDefault(); // Prevent default action of clicking on video suggestion
+      player.loadVideoById(getVideoIdFromUrl(event.target.href));
     }
   });
 }
+
+function getVideoIdFromUrl(url) {
+  const match = url.match(/[?&]v=([^&]+)/);
+  return match ? match[1] : null;
+}
+
 
 // Function to add a new video
 function addVideo() {

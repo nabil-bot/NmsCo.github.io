@@ -91,12 +91,10 @@ h1 {
 
 /* Volume slider icon */
 .volume-icon {
-  position: absolute;
-  top: 50%;
-  left: 10px; /* Adjust icon position */
-  transform: translateY(-50%);
+
+  /* transform: translateY(-50%); */
   font-size: 1.2em;
-  color: #280cff;
+  color: #3363ff;
 }
 
 /* Video speed controls and remove button */
@@ -106,6 +104,13 @@ h1 {
   justify-content: space-between;
   margin-top: 10px;
 }
+
+
+.volume-container {
+  display: flex; /* Use flexbox */
+  align-items: center; /* Align items vertically in the center */
+}
+
 
 .video-speed-wrapper {
   flex-grow: 1; /* Expand to fill available space */
