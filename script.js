@@ -141,7 +141,6 @@ function initializeYouTubeAPI(iframe, volume) {
     }
   });
 
-
   const suggestionsContainer = iframe.nextElementSibling;
   suggestionsContainer.addEventListener('click', function (event) {
     if (event.target.tagName === 'A') {

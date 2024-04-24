@@ -46,7 +46,7 @@ h1 {
 }
 
 #controls input[type="text"] {
-  width: calc(100% - 42px); /* Subtract the width of buttons and their margins */
+  width: calc(90% - 42px); /* Subtract the width of buttons and their margins */
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -75,12 +75,12 @@ h1 {
   }
 
   #controls input[type="text"] {
-    width: calc(100% - 20px); /* Adjust width to fit the container */
+    width: calc(90% - 20px); /* Adjust width to fit the container */
     margin-right: 0;
   }
 
   #controls button {
-    width: calc(100% - 20px); /* Adjust width to fit the container */
+    width: calc(30% - 20px); /* Adjust width to fit the container */
     margin-top: 10px;
   }
 }
@@ -119,12 +119,12 @@ h1 {
 .remove-btn {
   padding: 5px 10px;
   border: none;
-  background-color: #ff6347; /* Red color for remove button */
+  background-color: #ff2600; /* Red color for remove button */
   color: #fff;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .remove-btn:hover {
-  background-color: #cc4b39; /* Darker red color on hover */
+  background-color: #ff1e00; /* Darker red color on hover */
 }
