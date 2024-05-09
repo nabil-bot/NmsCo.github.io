@@ -5,7 +5,6 @@ let players = []; // Array to store YouTube player instances
 function addVideoPlayer(videoId, volume, speed) {
   const videosContainer = document.getElementById('videos-container');
 
-  // Create a div for the video player
   const videoWrapper = document.createElement('div');
   videoWrapper.classList.add('video-wrapper');
 
@@ -142,12 +141,10 @@ function initializeYouTubeAPI(iframe, volume) {
   });
 
 }
-
 function getVideoIdFromUrl(url) {
   const match = url.match(/[?&]v=([^&]+)/);
   return match ? match[1] : null;
 }
-
 
 // Function to add a new video
 function addVideo() {
@@ -158,17 +155,16 @@ function addVideo() {
     alert('Please enter a video URL.');
     return;
   }
-
   const volume = 0.5; // Default volume
   const speed = 1; // Default playback speed
   const videoId = getVideoId(videoUrl);
 
   // Add the new video player
   addVideoPlayer(videoId, volume, speed);
-
   // Clear the input field
   videoUrlInput.value = '';
 }
+
 
 // Function to remove a video
 function removeVideo(videoWrapper) {
@@ -182,15 +178,17 @@ function removeVideo(videoWrapper) {
   videoWrapper.remove();
 }
 
-// Function to extract video ID from YouTube URL
+// Function to extract video ID from YouTube URL 
 function getVideoId(url) {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  // Regular expression to match various YouTube URL formats
+  const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
   const match = url.match(regExp);
 
-  if (match && match[2].length === 11) {
-    return match[2];
+  if (match && match[1]) {
+    return match[1]; // Return the video ID
   } else {
     alert('Invalid YouTube URL.');
+    return null;
   }
 }
 
