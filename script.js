@@ -133,6 +133,7 @@ function addVideo() {
     getPlaylistVideos(videoUrl)
     .then(urls => {
       playlistVideos = urls;
+      alert(playlistVideos)
       playNextVideoFromPlaylist();
     })
     .catch(error => {
@@ -155,7 +156,7 @@ async function getPlaylistVideos(playlistUrl) {
     return;
   }
   try {
-    const videoUrls = fetchVideosFromPlaylist(playlistId);
+    const videoUrls = await fetchVideosFromPlaylist(playlistId);
     document.getElementById('videoUrls').value = videoUrls.join('\n');
   } catch (error) {
     console.error('Error:', error);
@@ -163,10 +164,10 @@ async function getPlaylistVideos(playlistUrl) {
   }
 }
 
-function fetchVideosFromPlaylist(playlistId) {
+async function fetchVideosFromPlaylist(playlistId) {
   const apiKey = 'AIzaSyDQkRgxuQ7i5-1UuYtuve8eZgAb1-XGe30';
-  const response = fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${apiKey}`);
-  const data = response.json();
+  const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${apiKey}`);
+  const data = await response.json();
   const videoUrls = [];
   for (const item of data.items) {
     if (item.kind === 'youtube#playlistItem') {
