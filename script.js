@@ -2,6 +2,8 @@ let videoCount = 0;
 let players = [];
 let currentPlaylistIndex = 0;
 let playlistVideos = [];
+
+
 function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   const videosContainer = document.getElementById('videos-container');
   const videoWrapper = document.createElement('div');
@@ -54,8 +56,6 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   });
   videoSpeedWrapper.appendChild(videoSpeedSelect);
   videoControlsWrapper.appendChild(videoSpeedWrapper);
-
-
     if (isPlaylist) {
       const previousButton = document.createElement('button');
       previousButton.textContent = '⏮';
@@ -73,7 +73,6 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
       });
       videoControlsWrapper.appendChild(nextButton);
     }
-
 
   const removeButton = document.createElement('button');
   removeButton.textContent = 'Remove';
@@ -96,53 +95,39 @@ function initializeYouTubeAPI(iframe, volume) {
       },
       'onStateChange': function (event) {
         if (event.data === YT.PlayerState.ENDED) {
-          // event.target.stopVideo();
-          // alert("video ended!");
-          playNextVideoFromPlaylist();
+          playNextVideoFromPlaylist()
         }
+      }
+      ,
+      'onError': function(event) {
+        const errorCode = event.data;
+        // Handle the error based on the errorCode
+        console.error('YouTube Player Error:', errorCode);
+        // For example, you can remove the video player or display an error message
       }
     }
   });
-  // document.addEventListener('visibilitychange', function () {
-  //   if (document.visibilityState === 'visible') {
-  //     players.forEach(player => {
-  //       if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-  //         player.playVideo();
-  //       }
-  //     });
-  //   } else {
-  //     players.forEach(player => {
-  //       if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-  //         player.playVideo();
-  //       }
-  //     });
-  //   }
-  // });
 }
 
 function addVideo() {
   const volume = 0.7;
   const speed = 1;
-  
   const videoUrlInput = document.getElementById('video-url');
   const videoUrl = videoUrlInput.value.trim();
   if (!videoUrl) {
     alert('Please enter a video URL.');
     return;
   }
-  
-  
   if (videoUrl.includes("&list=")){
     getPlaylistVideos(videoUrl)
     .then(urls => {
       playlistVideos = urls;
+      // if (videoCount == 0){
+      const videoId = getVideoId(playlistVideos[1]);
+      addVideoPlayer(videoId, volume, speed, isPlaylist=true);
+      // }else{
       // playNextVideoFromPlaylist();
-      if (videoCount == 0){
-        const videoId = getVideoId(playlistVideos[1]);
-        addVideoPlayer(videoId, volume, speed, isPlaylist=true);
-      }else{
-      playNextVideoFromPlaylist();
-      }
+      // }
     })
     .catch(error => {
       // Handle errors here
@@ -155,8 +140,6 @@ function addVideo() {
   }
   videoUrlInput.value = '';
 }
-
-
 function getPlaylistVideos(playlistUrl) {
   return new Promise((resolve, reject) => {
     const playlistId = new URL(playlistUrl).searchParams.get('list');
@@ -239,7 +222,7 @@ function playNextVideoFromPlaylist() {
   const currentVideoWrapper = document.querySelector('.video-wrapper');
   const iframe = currentVideoWrapper.querySelector('iframe');
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-  initializeYouTubeAPI(iframe, 0.7);
+  initializeYouTubeAPI(iframe, 0.6);
 }
 function playPreviousVideoFromPlaylist() {
   if (playlistVideos.length === 0) {
@@ -250,9 +233,28 @@ function playPreviousVideoFromPlaylist() {
   const videoId = getVideoId(previousVideoUrl);
   const iframe = document.querySelector('.video-wrapper iframe');
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-  initializeYouTubeAPI(iframe, 0.7);
+  initializeYouTubeAPI(iframe, 0.6);
 }
 
 
 document.getElementById('add-video-btn').addEventListener('click', addVideo);
 document.getElementById('paste-btn').addEventListener('click', pasteFromClipboard);
+
+
+// Pause/Play video when visibility of the page changes
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'visible') {
+    players.forEach(player => {
+      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+        player.playVideo(); // Resume playback if the player was playing
+      }
+    });
+  } 
+  else {
+    players.forEach(player => {
+      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+        player.playVideo(); // Resume playback if the player was playing
+      }
+    });
+  }
+});
