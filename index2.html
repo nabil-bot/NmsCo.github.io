@@ -18,7 +18,7 @@
     async function getPlaylistVideos() {
       const playlistUrl = document.getElementById('playlistUrl').value;
       const playlistId = new URL(playlistUrl).searchParams.get('list');
-
+        alert(playlistId);
       if (!playlistId) {
         alert('Invalid playlist URL. Please enter a valid URL with the "list" parameter.');
         return;

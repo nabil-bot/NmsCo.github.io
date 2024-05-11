@@ -1,7 +1,9 @@
 let videoCount = 0;
 let players = [];
+let currentPlaylistIndex = 0;
+let playlistVideos = [];
 
-function addVideoPlayer(videoId, volume, speed) {
+function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   const videosContainer = document.getElementById('videos-container');
   const videoWrapper = document.createElement('div');
   videoWrapper.classList.add('video-wrapper');
@@ -13,7 +15,6 @@ function addVideoPlayer(videoId, volume, speed) {
   iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true;
   videoWrapper.appendChild(iframe);
-
   const volumeContainer = document.createElement('div');
   volumeContainer.classList.add('volume-container');
   const speakerIcon = document.createElement('i');
@@ -27,11 +28,9 @@ function addVideoPlayer(videoId, volume, speed) {
   volumeSlider.classList.add('slider');
   volumeContainer.appendChild(volumeSlider);
   videoWrapper.appendChild(volumeContainer);
-
   volumeSlider.addEventListener('input', function () {
     setVolume(videoWrapper, volumeSlider.value);
   });
-
   const videoControlsWrapper = document.createElement('div');
   videoControlsWrapper.classList.add('video-controls');
   const videoSpeedWrapper = document.createElement('div');
@@ -40,7 +39,6 @@ function addVideoPlayer(videoId, volume, speed) {
   videoSpeedLabel.textContent = 'Video Speed:';
   videoSpeedLabel.classList.add('video-speed-label');
   videoSpeedWrapper.appendChild(videoSpeedLabel);
-
   const videoSpeedSelect = document.createElement('select');
   videoSpeedSelect.classList.add('video-speed-select');
   videoSpeedSelect.innerHTML = `
@@ -57,7 +55,24 @@ function addVideoPlayer(videoId, volume, speed) {
   });
   videoSpeedWrapper.appendChild(videoSpeedSelect);
   videoControlsWrapper.appendChild(videoSpeedWrapper);
+  
+  if (isPlaylist) {
+    const previousButton = document.createElement('button');
+    previousButton.textContent = '⏮';
+    previousButton.classList.add('previous-btn');
+    previousButton.addEventListener('click', function () {
+      playPreviousVideoFromPlaylist();
+    });
+    videoControlsWrapper.appendChild(previousButton);
 
+    const nextButton = document.createElement('button');
+    nextButton.textContent = '⏭';
+    nextButton.classList.add('next-btn');
+    nextButton.addEventListener('click', function () {
+      playNextVideoFromPlaylist();
+    });
+    videoControlsWrapper.appendChild(nextButton);
+  }
   const removeButton = document.createElement('button');
   removeButton.textContent = 'Remove';
   removeButton.classList.add('remove-btn');
@@ -66,7 +81,6 @@ function addVideoPlayer(videoId, volume, speed) {
   });
   videoControlsWrapper.appendChild(removeButton);
   videoWrapper.appendChild(videoControlsWrapper);
-
   videosContainer.appendChild(videoWrapper);
   initializeYouTubeAPI(iframe, volume);
 }
@@ -81,6 +95,7 @@ function initializeYouTubeAPI(iframe, volume) {
       'onStateChange': function (event) {
         if (event.data === YT.PlayerState.ENDED) {
           event.target.stopVideo();
+          playNextVideoFromPlaylist();
         }
       }
     }
@@ -104,18 +119,92 @@ function initializeYouTubeAPI(iframe, volume) {
 }
 
 function addVideo() {
+  const volume = 0.7;
+  const speed = 1;
+  
   const videoUrlInput = document.getElementById('video-url');
   const videoUrl = videoUrlInput.value.trim();
   if (!videoUrl) {
     alert('Please enter a video URL.');
     return;
   }
-  const volume = 0.7;
-  const speed = 1;
+  
+  if (videoUrl.includes("&list=")){
+    getPlaylistVideos(videoUrl)
+    .then(urls => {
+      playlistVideos = urls;
+      playNextVideoFromPlaylist();
+    })
+    .catch(error => {
+      // Handle errors here
+      console.error('Error:', error);
+      alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
+    });
+
+  }else{
   const videoId = getVideoId(videoUrl);
   addVideoPlayer(videoId, volume, speed);
+  }
   videoUrlInput.value = '';
 }
+
+async function getPlaylistVideos(playlistUrl) {
+  const playlistId = new URL(playlistUrl).searchParams.get('list');
+  if (!playlistId) {
+    alert('Invalid playlist URL. Please enter a valid URL with the "list" parameter.');
+    return;
+  }
+  try {
+    const videoUrls = await fetchVideosFromPlaylist(playlistId);
+    document.getElementById('videoUrls').value = videoUrls.join('\n');
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
+  }
+}
+
+async function fetchVideosFromPlaylist(playlistId) {
+  const apiKey = 'AIzaSyDQkRgxuQ7i5-1UuYtuve8eZgAb1-XGe30';
+  alert("i am safely here")
+  const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${apiKey}`);
+  const data = await response.json();
+
+  const videoUrls = [];
+  for (const item of data.items) {
+    if (item.kind === 'youtube#playlistItem') {
+      const videoId = item.snippet.resourceId.videoId;
+      const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      videoUrls.push(videoUrl);
+    }
+  }
+  return videoUrls;
+}
+
+
+
+function playNextVideoFromPlaylist() {
+  if (playlistVideos.length === 0) {
+    return;
+  }
+  currentPlaylistIndex = (currentPlaylistIndex + 1) % playlistVideos.length;
+  const nextVideoUrl = playlistVideos[currentPlaylistIndex];
+  const videoId = getVideoId(nextVideoUrl);
+  const iframe = document.querySelector('.video-wrapper iframe');
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+}
+function playPreviousVideoFromPlaylist() {
+  if (playlistVideos.length === 0) {
+    return;
+  }
+  currentPlaylistIndex = (currentPlaylistIndex - 1 + playlistVideos.length) % playlistVideos.length;
+  const previousVideoUrl = playlistVideos[currentPlaylistIndex];
+  const videoId = getVideoId(previousVideoUrl);
+  const iframe = document.querySelector('.video-wrapper iframe');
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+}
+
+
+
 
 function removeVideo(videoWrapper) {
   const iframe = videoWrapper.querySelector('iframe');
@@ -123,7 +212,6 @@ function removeVideo(videoWrapper) {
   players = players.filter(player => player.getVideoData().video_id !== videoId);
   videoWrapper.remove();
 }
-
 function getVideoId(url) {
   const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
   const match = url.match(regExp);
@@ -135,7 +223,6 @@ function getVideoId(url) {
     return null;
   }
 }
-
 function setVolume(videoWrapper, volume) {
   const iframe = videoWrapper.querySelector('iframe');
   const videoId = iframe.src.split('/').pop().split('?')[0];
@@ -144,7 +231,6 @@ function setVolume(videoWrapper, volume) {
     player.setVolume(volume);
   }
 }
-
 function setSpeed(videoWrapper, speed) {
   const iframe = videoWrapper.querySelector('iframe');
   const videoId = iframe.src.split('/').pop().split('?')[0];
@@ -153,7 +239,6 @@ function setSpeed(videoWrapper, speed) {
     player.setPlaybackRate(parseFloat(speed));
   }
 }
-
 function pasteFromClipboard() {
   navigator.clipboard.readText()
     .then(text => {
@@ -163,6 +248,5 @@ function pasteFromClipboard() {
       console.error('Failed to read clipboard contents: ', err);
     });
 }
-
 document.getElementById('add-video-btn').addEventListener('click', addVideo);
 document.getElementById('paste-btn').addEventListener('click', pasteFromClipboard);
