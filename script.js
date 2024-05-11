@@ -98,13 +98,6 @@ function initializeYouTubeAPI(iframe, volume) {
           playNextVideoFromPlaylist()
         }
       }
-      ,
-      'onError': function(event) {
-        const errorCode = event.data;
-        // Handle the error based on the errorCode
-        console.error('YouTube Player Error:', errorCode);
-        // For example, you can remove the video player or display an error message
-      }
     }
   });
 }
@@ -221,8 +214,12 @@ function playNextVideoFromPlaylist() {
   const videoId = getVideoId(nextVideoUrl);
   const currentVideoWrapper = document.querySelector('.video-wrapper');
   const iframe = currentVideoWrapper.querySelector('iframe');
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-  initializeYouTubeAPI(iframe, 0.6);
+  try{
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+    initializeYouTubeAPI(iframe, 0.6);
+  } catch (error) {
+    alert("eijeirji")
+  } 
 }
 function playPreviousVideoFromPlaylist() {
   if (playlistVideos.length === 0) {
