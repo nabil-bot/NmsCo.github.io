@@ -9,7 +9,7 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   const videoWrapper = document.createElement('div');
   videoWrapper.classList.add('video-wrapper');
   const iframe = document.createElement('iframe');
-  iframe.width = '560';
+  iframe.width = '99%';
   iframe.height = '315';
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
   iframe.frameborder = '0';
@@ -56,23 +56,35 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   });
   videoSpeedWrapper.appendChild(videoSpeedSelect);
   videoControlsWrapper.appendChild(videoSpeedWrapper);
-    if (isPlaylist) {
-      const previousButton = document.createElement('button');
-      previousButton.textContent = '⏮';
-      previousButton.classList.add('previous-btn');
-      previousButton.addEventListener('click', function () {
-        playPreviousVideoFromPlaylist();
-      });
-      videoControlsWrapper.appendChild(previousButton);
+    
 
-      const nextButton = document.createElement('button');
-      nextButton.textContent = '⏭';
-      nextButton.classList.add('next-btn');
-      nextButton.addEventListener('click', function () {
-        playNextVideoFromPlaylist();
-      });
-      videoControlsWrapper.appendChild(nextButton);
-    }
+  if (isPlaylist) {
+    const previousButton = document.createElement('button');
+    previousButton.textContent = '⏮';
+    previousButton.classList.add('previous-btn');
+    previousButton.addEventListener('click', function () {
+      playPreviousVideoFromPlaylist(videoWrapper);
+    });
+    videoControlsWrapper.appendChild(previousButton);
+
+    const nextButton = document.createElement('button');
+    nextButton.textContent = '⏭';
+    nextButton.classList.add('next-btn');
+    nextButton.addEventListener('click', function () {
+      playNextVideoFromPlaylist(videoWrapper);
+    });
+    videoControlsWrapper.appendChild(nextButton);
+
+    previousButton.style.height = '26px';
+    nextButton.style.height = '26px';
+    previousButton.style.fontSize = '15px';
+    nextButton.style.fontSize = '16px';
+
+    var label = document.createElement('label');
+    label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
+    label.style.fontSize = '14px';
+    videoControlsWrapper.appendChild(label);
+  }
 
   const removeButton = document.createElement('button');
   removeButton.textContent = '❌';
@@ -84,25 +96,76 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   videoWrapper.appendChild(videoControlsWrapper);
   videosContainer.appendChild(videoWrapper);
 
+
+  function playNextVideoFromPlaylist(videoWrapper) {
+    
+    if (playlistVideos.length === 0) {
+      return;
+    }
+    currentPlaylistIndex = (currentPlaylistIndex + 1) % playlistVideos.length;
+
+    label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
+    const nextVideoUrl = playlistVideos[currentPlaylistIndex];
+    const videoId = getVideoId(nextVideoUrl);
+    // const currentVideoWrapper = document.querySelector('.video-wrapper');
+    // const iframe = currentVideoWrapper.querySelector('iframe');
+    const iframe = videoWrapper.querySelector('iframe');
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+    const slider = videoWrapper.querySelector('.slider');
+    initializeYouTubeAPI(iframe, slider.value);
+  }
+  function playPreviousVideoFromPlaylist(videoWrapper) {
+    if (playlistVideos.length === 0) {
+      return;
+    }
+    currentPlaylistIndex = (currentPlaylistIndex - 1 + playlistVideos.length) % playlistVideos.length;
+    label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
+    const previousVideoUrl = playlistVideos[currentPlaylistIndex];
+    const videoId = getVideoId(previousVideoUrl);
+    const iframe = videoWrapper.querySelector('iframe');
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+    const slider = videoWrapper.querySelector('.slider');
+    initializeYouTubeAPI(iframe, slider.value);
+  }
+
+  
+  function initializeYouTubeAPI(iframe, volume) {
+    delete YT
+    const player = new YT.Player(iframe, {
+      events: {
+        'onReady': function (event) {
+          event.target.setVolume(volume);
+          players.push(event.target);
+        },
+        'onStateChange': function (event) {
+          if (event.data === YT.PlayerState.ENDED) {
+            playNextVideoFromPlaylist(videoWrapper)
+          }
+
+        }
+      }
+    });
+  }
+
   initializeYouTubeAPI(iframe, volume);
 }
 
-function initializeYouTubeAPI(iframe, volume) {
-  const player = new YT.Player(iframe, {
-    events: {
-      'onReady': function (event) {
-        event.target.setVolume(volume);
-        players.push(event.target);
-      },
-      'onStateChange': function (event) {
-        if (event.data === YT.PlayerState.ENDED) {
-          playNextVideoFromPlaylist()
-        }
+// function initializeYouTubeAPI(iframe, volume) {
+//   const player = new YT.Player(iframe, {
+//     events: {
+//       'onReady': function (event) {
+//         event.target.setVolume(volume);
+//         players.push(event.target);
+//       },
+//       'onStateChange': function (event) {
+//         if (event.data === YT.PlayerState.ENDED) {
+//           playNextVideoFromPlaylist()
+//         }
 
-      }
-    }
-  });
-}
+//       }
+//     }
+//   });
+// }
 
 function addVideo() {
   const volume = 50;
@@ -113,7 +176,7 @@ function addVideo() {
     navigator.clipboard.readText()
     .then(text => {
       document.getElementById('video-url').value = text.trim();
-      addVideo()
+      let videoUrl = text.trim();
     })
     .catch(err => {
       console.error('Failed to read clipboard contents: ', err);
@@ -213,31 +276,7 @@ function pasteFromClipboard() {
       console.error('Failed to read clipboard contents: ', err);
     });
 }
-function playNextVideoFromPlaylist() {
-  if (playlistVideos.length === 0) {
-    return;
-  }
-  currentPlaylistIndex = (currentPlaylistIndex + 1) % playlistVideos.length;
-  const nextVideoUrl = playlistVideos[currentPlaylistIndex];
-  const videoId = getVideoId(nextVideoUrl);
-  const currentVideoWrapper = document.querySelector('.video-wrapper');
-  const iframe = currentVideoWrapper.querySelector('iframe');
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-  const slider = currentVideoWrapper.querySelector('.slider');
-  initializeYouTubeAPI(iframe, slider.value);
-}
-function playPreviousVideoFromPlaylist() {
-  if (playlistVideos.length === 0) {
-    return;
-  }
-  currentPlaylistIndex = (currentPlaylistIndex - 1 + playlistVideos.length) % playlistVideos.length;
-  const previousVideoUrl = playlistVideos[currentPlaylistIndex];
-  const videoId = getVideoId(previousVideoUrl);
-  const iframe = document.querySelector('.video-wrapper iframe');
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-  const slider = currentVideoWrapper.querySelector('.slider');
-  initializeYouTubeAPI(iframe, slider.value);
-}
+
 
 
 document.getElementById('add-video-btn').addEventListener('click', addVideo);
