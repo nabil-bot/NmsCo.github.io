@@ -21,6 +21,9 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   const speakerIcon = document.createElement('i');
   speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
   volumeContainer.appendChild(speakerIcon);
+
+  
+
   const volumeSlider = document.createElement('input');
   volumeSlider.type = 'range';
   volumeSlider.min = 0;
@@ -32,6 +35,17 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   volumeSlider.addEventListener('input', function () {
     setVolume(videoWrapper, volumeSlider.value);
   });
+
+
+  speakerIcon.addEventListener('click', function() {
+    if (volumeSlider.value > 0){
+      setVolume(videoWrapper, 0);
+    }else if (volumeSlider.value == 0) {
+      setVolume(videoWrapper, 50);
+    }
+    
+  });
+
   const videoControlsWrapper = document.createElement('div');
   videoControlsWrapper.classList.add('video-controls');
   const videoSpeedWrapper = document.createElement('div');
