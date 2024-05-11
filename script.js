@@ -123,7 +123,7 @@ function addVideo() {
     .then(urls => {
       playlistVideos = urls;
       // if (videoCount == 0){
-      const videoId = getVideoId(playlistVideos[1]);
+      const videoId = getVideoId(playlistVideos[0]);
       addVideoPlayer(videoId, volume, speed, isPlaylist=true);
       // }else{
       // playNextVideoFromPlaylist();
