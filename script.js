@@ -37,7 +37,7 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   const videoSpeedWrapper = document.createElement('div');
   videoSpeedWrapper.classList.add('video-speed-wrapper');
   const videoSpeedLabel = document.createElement('label');
-  videoSpeedLabel.textContent = 'Video Speed:';
+  videoSpeedLabel.textContent = 'Speed:';
   videoSpeedLabel.classList.add('video-speed-label');
   videoSpeedWrapper.appendChild(videoSpeedLabel);
   const videoSpeedSelect = document.createElement('select');
@@ -75,7 +75,7 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
     }
 
   const removeButton = document.createElement('button');
-  removeButton.textContent = 'Remove';
+  removeButton.textContent = '❌';
   removeButton.classList.add('remove-btn');
   removeButton.addEventListener('click', function () {
     removeVideo(videoWrapper);

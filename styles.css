@@ -112,19 +112,20 @@ h1 {
 }
 
 
-.video-speed-wrapper {
-  flex-grow: 1; /* Expand to fill available space */
-}
+/* .video-speed-wrapper {
+  flex-grow: 1; 
+} */
 
 .remove-btn {
+  margin-left: 25%;
   padding: 5px 10px;
   border: none;
-  background-color: #ff2600; /* Red color for remove button */
+  background-color: #f0ffe1; /* Red color for remove button */
   color: #fff;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .remove-btn:hover {
-  background-color: #ff1e00; /* Darker red color on hover */
+  background-color: #ffb2a8; /* Darker red color on hover */
 }
