@@ -40,12 +40,9 @@ volumeSlider.min = 0;
 volumeSlider.max = 100;
 volumeSlider.value = volume * 100;
 volumeSlider.classList.add('slider');
-
 volumeContainer.appendChild(volumeSlider);
-
 // Append volume container to the video wrapper
 videoWrapper.appendChild(volumeContainer);
-
   volumeSlider.addEventListener('input', function () {
     setVolume(videoWrapper, volumeSlider.value);
   });
