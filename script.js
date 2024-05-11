@@ -201,8 +201,6 @@ function playPreviousVideoFromPlaylist() {
 }
 
 
-
-
 function removeVideo(videoWrapper) {
   const iframe = videoWrapper.querySelector('iframe');
   const videoId = iframe.src.split('/').pop().split('?')[0];
