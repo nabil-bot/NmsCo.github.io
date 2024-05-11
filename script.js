@@ -97,12 +97,12 @@ function initializeYouTubeAPI(iframe, volume) {
       'onStateChange': function (event) {
         if (event.data === YT.PlayerState.ENDED) {
           event.target.stopVideo();
+          // alert("video ended!");
           playNextVideoFromPlaylist();
         }
       }
     }
   });
-
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {
       players.forEach(player => {
@@ -136,9 +136,7 @@ function addVideo() {
     getPlaylistVideos(videoUrl)
     .then(urls => {
       playlistVideos = urls;
-      alert(playlistVideos)
       // playNextVideoFromPlaylist();
-
       if (videoCount == 0){
         const videoId = getVideoId(playlistVideos[1]);
         addVideoPlayer(videoId, volume, speed, isPlaylist=true);
@@ -241,6 +239,7 @@ function playNextVideoFromPlaylist() {
   const currentVideoWrapper = document.querySelector('.video-wrapper');
   const iframe = currentVideoWrapper.querySelector('iframe');
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+  initializeYouTubeAPI(iframe, 0.7);
 }
 
 function playPreviousVideoFromPlaylist() {
@@ -252,6 +251,7 @@ function playPreviousVideoFromPlaylist() {
   const videoId = getVideoId(previousVideoUrl);
   const iframe = document.querySelector('.video-wrapper iframe');
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+  initializeYouTubeAPI(iframe, 0.7);
 }
 
 
