@@ -83,6 +83,7 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   videoControlsWrapper.appendChild(removeButton);
   videoWrapper.appendChild(videoControlsWrapper);
   videosContainer.appendChild(videoWrapper);
+
   initializeYouTubeAPI(iframe, volume);
 }
 
@@ -214,14 +215,9 @@ function playNextVideoFromPlaylist() {
   const videoId = getVideoId(nextVideoUrl);
   const currentVideoWrapper = document.querySelector('.video-wrapper');
   const iframe = currentVideoWrapper.querySelector('iframe');
-  try{
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-    
-    players
-    initializeYouTubeAPI(iframe, 0.6);
-  } catch (error) {
-    alert("eijeirji")
-  } 
+
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+  initializeYouTubeAPI(iframe, 0.6);
 }
 function playPreviousVideoFromPlaylist() {
   if (playlistVideos.length === 0) {
