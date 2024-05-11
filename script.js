@@ -2,37 +2,27 @@ let videoCount = 0;
 let players = []; // Array to store YouTube player instances
 
 // Function to add a new video player
-function addVideoPlayer(videoId, volume, speed) {
+function addVideoPlayer(url, volume, speed) {
   const videosContainer = document.getElementById('videos-container');
-
   const videoWrapper = document.createElement('div');
   videoWrapper.classList.add('video-wrapper');
-
-  // Create an iframe for the YouTube video
   const iframe = document.createElement('iframe');
-  iframe.width = '560';
-  iframe.height = '315';
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+  iframe.width = '580';
+  iframe.height = '320';
+  const videoID = getVideoId(url)
+  iframe.src = `https://www.youtube.com/embed/${videoID}?autoplay=1&enablejsapi=1&mute=0`;
   iframe.frameborder = '0';
   iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true;
-
   // Append the iframe to the video wrapper
   videoWrapper.appendChild(iframe);
-
-
-  // Create volume container
 const volumeContainer = document.createElement('div');
 volumeContainer.classList.add('volume-container');
-
 // Create speaker icon
 const speakerIcon = document.createElement('i');
 speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
-
-
 // Append speaker icon and volume slider to volume container
 volumeContainer.appendChild(speakerIcon);
-
 // Create volume slider
 const volumeSlider = document.createElement('input');
 volumeSlider.type = 'range';
@@ -40,29 +30,22 @@ volumeSlider.min = 0;
 volumeSlider.max = 100;
 volumeSlider.value = volume * 100;
 volumeSlider.classList.add('slider');
-
 volumeContainer.appendChild(volumeSlider);
-
 // Append volume container to the video wrapper
 videoWrapper.appendChild(volumeContainer);
-
   volumeSlider.addEventListener('input', function () {
     setVolume(videoWrapper, volumeSlider.value);
   });
-
   // Create video speed controls and remove button wrapper
   const videoControlsWrapper = document.createElement('div');
   videoControlsWrapper.classList.add('video-controls');
-
   // Create video speed controls
   const videoSpeedWrapper = document.createElement('div');
   videoSpeedWrapper.classList.add('video-speed-wrapper');
-
   const videoSpeedLabel = document.createElement('label');
   videoSpeedLabel.textContent = 'Video Speed:';
   videoSpeedLabel.classList.add('video-speed-label');
   videoSpeedWrapper.appendChild(videoSpeedLabel);
-
   const videoSpeedSelect = document.createElement('select');
   videoSpeedSelect.classList.add('video-speed-select');
   videoSpeedSelect.innerHTML = `
@@ -78,10 +61,8 @@ videoWrapper.appendChild(volumeContainer);
     setSpeed(videoWrapper, videoSpeedSelect.value);
   });
   videoSpeedWrapper.appendChild(videoSpeedSelect);
-
   // Append video speed controls to the video controls wrapper
   videoControlsWrapper.appendChild(videoSpeedWrapper);
-
   // Create remove button
   const removeButton = document.createElement('button');
   removeButton.textContent = 'Remove';
@@ -90,36 +71,57 @@ videoWrapper.appendChild(volumeContainer);
     removeVideo(videoWrapper);
   });
 
-  // Append remove button to the video controls wrapper
   videoControlsWrapper.appendChild(removeButton);
-
-  // Append the video controls wrapper to the video wrapper
   videoWrapper.appendChild(videoControlsWrapper);
-
-  // Append the video wrapper to the videos container
   videosContainer.appendChild(videoWrapper);
 
-  // Initialize the YouTube iframe API for the video
-  initializeYouTubeAPI(iframe, volume);
+  if (list==true) {
+    initializeYouTubeAPI(iframe, volume, playlistId=getPlaylistId(url));
+  } else {
+    initializeYouTubeAPI(iframe, volume);
+  }
 }
 
-// Function to initialize the YouTube iframe API for a video
-// Function to initialize the YouTube iframe API for a video
-function initializeYouTubeAPI(iframe, volume) {
-  const player = new YT.Player(iframe, {
-    events: {
-      'onReady': function (event) {
-        event.target.setVolume(volume * 100); // Set volume (0-100)
-        players.push(event.target); // Add player instance to the array
-      },
-      'onStateChange': function (event) {
-        if (event.data === YT.PlayerState.ENDED) {
-          event.target.stopVideo();
+function initializeYouTubeAPI(iframe, volume, playlistId = "") {
+  if (playlistId == ""){
+    const player = new YT.Player(iframe, {
+      events: {
+        'onReady': function (event) {
+          event.target.setVolume(volume * 100); // Set volume (0-100)
+          players.push(event.target); // Add player instance to the array
         }
       }
-    }
-  });
+      });
+  } else{
 
+    const apiKey = "AIzaSyDQkRgxuQ7i5-1UuYtuve8eZgAb1-XGe30"
+    fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`)
+    .then(response => response.json())
+    .then(data => {
+      const videoIds = data.items.map(item => item.snippet.resourceId.videoId);
+      console.log(videoIds);
+    })
+    .catch(error => {
+      console.error('Error fetching playlist videos:', error);
+    });
+
+
+    const player = new YT.Player(iframe, {
+      
+      videoId: '', // empty for playlist
+      listType: 'playlist',
+      list: playlistId, // replace with your playlist ID
+      playerVars: { 'autoplay': 0, 'controls': 1 },
+    
+      events: {
+        'onReady': function (event) {
+          event.target.setVolume(volume * 100); // Set volume (0-100)
+          players.push(event.target); // Add player instance to the array
+        }
+      }
+      });
+
+  }
   // Pause/Play video when visibility of the page changes
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {
@@ -139,12 +141,8 @@ function initializeYouTubeAPI(iframe, volume) {
       });
     }
   });
+}
 
-}
-function getVideoIdFromUrl(url) {
-  const match = url.match(/[?&]v=([^&]+)/);
-  return match ? match[1] : null;
-}
 
 // Function to add a new video
 function addVideo() {
@@ -155,12 +153,10 @@ function addVideo() {
     alert('Please enter a video URL.');
     return;
   }
-  const volume = 0.5; // Default volume
+  const volume = 1; // Default volume
   const speed = 1; // Default playback speed
-  const videoId = getVideoId(videoUrl);
 
-  // Add the new video player
-  addVideoPlayer(videoId, volume, speed);
+  addVideoPlayer(videoUrl, volume, speed);
   // Clear the input field
   videoUrlInput.value = '';
 }
@@ -180,23 +176,34 @@ function removeVideo(videoWrapper) {
 
 // Function to extract video ID from YouTube URL 
 function getVideoId(url) {
-  // Regular expression to match various YouTube URL formats
-  const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
-  const match = url.match(regExp);
-
+  // Check for video ID first
+  var regex = /\/watch\?v=([^&]+)/;
+  var match = url.match(regex);
+  // Return the captured group (video ID) if found, otherwise null
   if (match && match[1]) {
-    return match[1]; // Return the video ID
-  } else {
-    alert('Invalid YouTube URL.');
-    return null;
-  }
+    return match[1];
+  } 
+  // for live video ===============
+  var regex = /\/live\/([^?]+)/;
+  var match = url.match(regex);
+  if (match && match[1]) {
+    return match[1];
+  } 
+}
+
+function getPlaylistId(url) {
+  const regex = /\?si=([^&]+)/;
+  const match = regex.exec(url);
+  if (match && match[1]) {
+    return match[1];
+  } 
+  return null;
 }
 
 // Function to set volume for a video
 function setVolume(videoWrapper, volume) {
   const iframe = videoWrapper.querySelector('iframe');
   const videoId = iframe.src.split('/').pop().split('?')[0]; // Extract video ID from iframe src
-
   // Retrieve the YouTube player instance by video ID
   const player = players.find(player => player.getVideoData().video_id === videoId);
 
@@ -210,16 +217,13 @@ function setVolume(videoWrapper, volume) {
 function setSpeed(videoWrapper, speed) {
   const iframe = videoWrapper.querySelector('iframe');
   const videoId = iframe.src.split('/').pop().split('?')[0]; // Extract video ID from iframe src
-
   // Retrieve the YouTube player instance by video ID
   const player = players.find(player => player.getVideoData().video_id === videoId);
-
   // Set the playback rate using the YouTube API
   if (player) {
     player.setPlaybackRate(parseFloat(speed));
   }
 }
-
 // Function to paste clipboard content into the input field
 function pasteFromClipboard() {
   navigator.clipboard.readText()
