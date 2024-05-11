@@ -350,6 +350,7 @@ function initializeYouTubeAPI(iframe, volume) {
       'onStateChange': function (event) {
         if (event.data === YT.PlayerState.ENDED) {
           event.target.stopVideo();
+          playNextVideoFromPlaylist();
         }
       }
     }
