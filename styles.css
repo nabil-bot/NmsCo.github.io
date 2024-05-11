@@ -46,7 +46,7 @@ h1 {
 }
 
 #controls input[type="text"] {
-  width: calc(90% - 42px); /* Subtract the width of buttons and their margins */
+  width: calc(90% - 42px); 
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -67,37 +67,32 @@ h1 {
   background-color: #0056b3;
 }
 
-/* Media queries for responsiveness */
+
 @media screen and (max-width: 600px) {
   #controls {
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center; /* Center elements horizontally */
+    flex-direction: column;
+    align-items: center; 
   }
 
   #controls input[type="text"] {
-    width: calc(90% - 20px); /* Adjust width to fit the container */
+    width: calc(90% - 20px); 
     margin-right: 0;
   }
 
   #controls button {
-    width: calc(50% - 20px); /* Adjust width to fit the container */
+    width: calc(50% - 20px);
     margin-top: 10px;
   }
 }
 
 
 
-/* Existing styles... */
-
-/* Volume slider icon */
 .volume-icon {
 
-  /* transform: translateY(-50%); */
   font-size: 1.2em;
   color: #3363ff;
 }
 
-/* Video speed controls and remove button */
 .video-controls {
   display: flex;
   align-items: center;
@@ -107,25 +102,97 @@ h1 {
 
 
 .volume-container {
-  display: flex; /* Use flexbox */
-  align-items: center; /* Align items vertically in the center */
+  display: flex; 
+  align-items: center; 
 }
-
-
-/* .video-speed-wrapper {
-  flex-grow: 1; 
-} */
 
 .remove-btn {
   margin-left: 25%;
   padding: 5px 10px;
   border: none;
-  background-color: #f0ffe1; /* Red color for remove button */
+  background-color: #f0ffe1; 
   color: #fff;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .remove-btn:hover {
-  background-color: #ffb2a8; /* Darker red color on hover */
+  background-color: #ffb2a8;
+}
+
+input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #3498db; 
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+label {
+  font-size: 18px;
+  color: #333;
+  cursor: pointer;
+}
+
+#globalControls {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center; 
+  height: 100vh; 
+}
+
+
+
+
+
+/* Global styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+
+#videos-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+}
+
+#controls {
+  text-align: center;
+  margin: 20px auto;
+}
+
+/* Styling for small screens (mobile) */
+@media screen and (max-width: 600px) {
+  header h1 {
+    font-size: 20px;
+  }
+}
+
+/* Styling for big screens (desktop) */
+@media screen and (min-width: 601px) {
+  header h1 {
+    font-size: 28px;
+  }
+
+  #videos-container {
+    padding: 40px;
+  }
+}
+
+/* Styles for global controls */
+#goblaControls {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Optional: Style the checkbox label */
+#goblaControls label {
+  margin-left: 5px;
+  font-size: 16px;
+  color: #333;
 }

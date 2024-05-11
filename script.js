@@ -25,7 +25,7 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   volumeSlider.type = 'range';
   volumeSlider.min = 0;
   volumeSlider.max = 100;
-  volumeSlider.value = volume * 100;
+  volumeSlider.value = volume;
   volumeSlider.classList.add('slider');
   volumeContainer.appendChild(volumeSlider);
   videoWrapper.appendChild(volumeContainer);
@@ -91,26 +91,36 @@ function initializeYouTubeAPI(iframe, volume) {
   const player = new YT.Player(iframe, {
     events: {
       'onReady': function (event) {
-        event.target.setVolume(volume * 100);
+        event.target.setVolume(volume);
         players.push(event.target);
       },
       'onStateChange': function (event) {
         if (event.data === YT.PlayerState.ENDED) {
           playNextVideoFromPlaylist()
         }
+
       }
     }
   });
 }
 
 function addVideo() {
-  const volume = 0.7;
+  const volume = 50;
   const speed = 1;
   const videoUrlInput = document.getElementById('video-url');
-  const videoUrl = videoUrlInput.value.trim();
+  let videoUrl = videoUrlInput.value.trim();
   if (!videoUrl) {
-    alert('Please enter a video URL.');
-    return;
+    navigator.clipboard.readText()
+    .then(text => {
+      document.getElementById('video-url').value = text.trim();
+      addVideo()
+    })
+    .catch(err => {
+      console.error('Failed to read clipboard contents: ', err);
+      alert('Please enter a video URL.');
+      return;
+    });
+    
   }
   if (videoUrl.includes("&list=")){
     getPlaylistVideos(videoUrl)
@@ -119,9 +129,7 @@ function addVideo() {
       // if (videoCount == 0){
       const videoId = getVideoId(playlistVideos[0]);
       addVideoPlayer(videoId, volume, speed, isPlaylist=true);
-      // }else{
-      // playNextVideoFromPlaylist();
-      // }
+
     })
     .catch(error => {
       // Handle errors here
@@ -137,7 +145,6 @@ function addVideo() {
 function getPlaylistVideos(playlistUrl) {
   return new Promise((resolve, reject) => {
     const playlistId = new URL(playlistUrl).searchParams.get('list');
-
     if (!playlistId) {
       reject('Invalid playlist URL. Please enter a valid URL with the "list" parameter.');
       return;
@@ -215,9 +222,9 @@ function playNextVideoFromPlaylist() {
   const videoId = getVideoId(nextVideoUrl);
   const currentVideoWrapper = document.querySelector('.video-wrapper');
   const iframe = currentVideoWrapper.querySelector('iframe');
-
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-  initializeYouTubeAPI(iframe, 0.6);
+  const slider = currentVideoWrapper.querySelector('.slider');
+  initializeYouTubeAPI(iframe, slider.value);
 }
 function playPreviousVideoFromPlaylist() {
   if (playlistVideos.length === 0) {
@@ -228,7 +235,8 @@ function playPreviousVideoFromPlaylist() {
   const videoId = getVideoId(previousVideoUrl);
   const iframe = document.querySelector('.video-wrapper iframe');
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-  initializeYouTubeAPI(iframe, 0.6);
+  const slider = currentVideoWrapper.querySelector('.slider');
+  initializeYouTubeAPI(iframe, slider.value);
 }
 
 
@@ -238,6 +246,9 @@ document.getElementById('paste-btn').addEventListener('click', pasteFromClipboar
 
 // Pause/Play video when visibility of the page changes
 document.addEventListener('visibilitychange', function () {
+
+  var checkbox = document.getElementById('myCheckbox');
+  if (checkbox.checked) {
   if (document.visibilityState === 'visible') {
     players.forEach(player => {
       if (player.getPlayerState() === YT.PlayerState.PLAYING) {
@@ -252,4 +263,5 @@ document.addEventListener('visibilitychange', function () {
       }
     });
   }
+} 
 });
