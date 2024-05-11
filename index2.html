@@ -1,13 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My YouTube Playlist</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Player</title>
+<style>
+    .container {
+        text-align: center;
+        margin-top: 50px;
+    }
+    audio {
+        width: 300px;
+    }
+</style>
 </head>
 <body>
-  <h1>My Favorite Music Videos</h1>
-  <p>Check out this playlist of awesome music videos!</p>
-  
-  <iframe width="640" height="360" src="https://www.youtube.com/embed/GEXlG_fQrbg?list=PL7pkSK1xbGD7yqMMnmNct0Rfl5wWsN2DV" title="Cinematic Adventure Epic Podcast by Infraction [No Copyright Music] / Storyteller" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  
+<div class="container">
+    <input type="file" id="audioFile" accept="audio/*">
+    <br>
+    <audio id="audioPlayer" controls>
+    </audio>
+    <br>
+    <button onclick="togglePlayPause()">Play/Pause</button>
+    <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1" onchange="changeVolume()">
+</div>
+
+<script>
+    let audioPlayer = document.getElementById('audioPlayer');
+    let volumeControl = document.getElementById('volumeControl');
+
+    function togglePlayPause() {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+        } else {
+            audioPlayer.pause();
+        }
+    }
+
+    function changeVolume() {
+        audioPlayer.volume = volumeControl.value;
+    }
+
+    document.getElementById('audioFile').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const fileURL = URL.createObjectURL(file);
+        audioPlayer.src = fileURL;
+    });
+</script>
 </body>
 </html>
