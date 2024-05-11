@@ -96,28 +96,28 @@ function initializeYouTubeAPI(iframe, volume) {
       },
       'onStateChange': function (event) {
         if (event.data === YT.PlayerState.ENDED) {
-          event.target.stopVideo();
+          // event.target.stopVideo();
           // alert("video ended!");
           playNextVideoFromPlaylist();
         }
       }
     }
   });
-  document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') {
-      players.forEach(player => {
-        if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-          player.playVideo();
-        }
-      });
-    } else {
-      players.forEach(player => {
-        if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-          player.playVideo();
-        }
-      });
-    }
-  });
+  // document.addEventListener('visibilitychange', function () {
+  //   if (document.visibilityState === 'visible') {
+  //     players.forEach(player => {
+  //       if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+  //         player.playVideo();
+  //       }
+  //     });
+  //   } else {
+  //     players.forEach(player => {
+  //       if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+  //         player.playVideo();
+  //       }
+  //     });
+  //   }
+  // });
 }
 
 function addVideo() {
@@ -241,7 +241,6 @@ function playNextVideoFromPlaylist() {
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
   initializeYouTubeAPI(iframe, 0.7);
 }
-
 function playPreviousVideoFromPlaylist() {
   if (playlistVideos.length === 0) {
     return;
