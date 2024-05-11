@@ -393,7 +393,7 @@ function addVideo() {
 
       if (videoCount == 0){
         const videoId = getVideoId(playlistVideos[1]);
-        addVideoPlayer(videoId, volume, speed);
+        addVideoPlayer(videoId, volume, speed, isPlaylist=true);
       }else{
       playNextVideoFromPlaylist();
       }
@@ -419,7 +419,6 @@ function getPlaylistVideos(playlistUrl) {
       reject('Invalid playlist URL. Please enter a valid URL with the "list" parameter.');
       return;
     }
-
     fetchVideosFromPlaylist(playlistId)
       .then(videoUrls => {
         resolve(videoUrls);
@@ -433,7 +432,6 @@ function getPlaylistVideos(playlistUrl) {
 async function fetchVideosFromPlaylist(playlistId) {
   const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=AIzaSyDQkRgxuQ7i5-1UuYtuve8eZgAb1-XGe30`);
   const data = await response.json();
-
   const videoUrls = [];
   for (const item of data.items) {
     if (item.kind === 'youtube#playlistItem') {
