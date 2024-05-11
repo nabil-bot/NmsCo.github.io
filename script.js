@@ -92,36 +92,7 @@ function initializeYouTubeAPI(iframe, volume, playlistId = "") {
         }
       }
       });
-  } else{
-
-    const apiKey = "AIzaSyDQkRgxuQ7i5-1UuYtuve8eZgAb1-XGe30"
-    fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`)
-    .then(response => response.json())
-    .then(data => {
-      const videoIds = data.items.map(item => item.snippet.resourceId.videoId);
-      console.log(videoIds);
-    })
-    .catch(error => {
-      console.error('Error fetching playlist videos:', error);
-    });
-
-
-    const player = new YT.Player(iframe, {
-      
-      videoId: '', // empty for playlist
-      listType: 'playlist',
-      list: playlistId, // replace with your playlist ID
-      playerVars: { 'autoplay': 0, 'controls': 1 },
-    
-      events: {
-        'onReady': function (event) {
-          event.target.setVolume(volume * 100); // Set volume (0-100)
-          players.push(event.target); // Add player instance to the array
-        }
-      }
-      });
-
-  }
+  } 
   // Pause/Play video when visibility of the page changes
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {
