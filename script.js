@@ -216,6 +216,8 @@ function playNextVideoFromPlaylist() {
   const iframe = currentVideoWrapper.querySelector('iframe');
   try{
     iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
+    
+    players
     initializeYouTubeAPI(iframe, 0.6);
   } catch (error) {
     alert("eijeirji")
