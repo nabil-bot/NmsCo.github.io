@@ -1,15 +1,16 @@
 let videoCount = 0;
 let players = [];
-let currentPlaylistIndex = 0;
-let playlistVideos = [];
+// let currentPlaylistIndex = 0;
+// let playlistVideos = [];
 
 
-function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
+function addVideoPlayer(videoId, volume, speed, isPlaylist = false, playlistVideos=[]) {
+  let currentPlaylistIndex=0
   const videosContainer = document.getElementById('videos-container');
   const videoWrapper = document.createElement('div');
   videoWrapper.classList.add('video-wrapper');
   const iframe = document.createElement('iframe');
-  iframe.width = '99%';
+  iframe.width = '580';
   iframe.height = '315';
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
   iframe.frameborder = '0';
@@ -22,7 +23,6 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
   speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
   volumeContainer.appendChild(speakerIcon);
 
-  
 
   const volumeSlider = document.createElement('input');
   volumeSlider.type = 'range';
@@ -112,10 +112,10 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
 
 
   function playNextVideoFromPlaylist(videoWrapper) {
-    
     if (playlistVideos.length === 0) {
       return;
     }
+
     currentPlaylistIndex = (currentPlaylistIndex + 1) % playlistVideos.length;
 
     label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
@@ -144,12 +144,16 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false) {
 
   
   function initializeYouTubeAPI(iframe, volume) {
-    delete YT
+    // delete YT
     const player = new YT.Player(iframe, {
       events: {
         'onReady': function (event) {
           event.target.setVolume(volume);
-          players.push(event.target);
+          // players.push(event.target);
+
+          if (players.indexOf(event) === -1) {
+            players.push(event.target);
+          }
         },
         'onStateChange': function (event) {
           if (event.data === YT.PlayerState.ENDED) {
@@ -191,6 +195,7 @@ function addVideo() {
     .then(text => {
       document.getElementById('video-url').value = text.trim();
       let videoUrl = text.trim();
+      return
     })
     .catch(err => {
       console.error('Failed to read clipboard contents: ', err);
@@ -202,11 +207,10 @@ function addVideo() {
   if (videoUrl.includes("&list=")){
     getPlaylistVideos(videoUrl)
     .then(urls => {
-      playlistVideos = urls;
-      // if (videoCount == 0){
-      const videoId = getVideoId(playlistVideos[0]);
-      addVideoPlayer(videoId, volume, speed, isPlaylist=true);
 
+      // if (videoCount == 0){
+      const videoId = getVideoId(urls[0]);
+      addVideoPlayer(videoId, volume, speed, isPlaylist=true, urls);
     })
     .catch(error => {
       // Handle errors here
