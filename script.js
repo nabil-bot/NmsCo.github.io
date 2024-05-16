@@ -256,20 +256,10 @@ initializeYouTubeAPI(iframe, volume);
 
 
 async function addVideo() {
+  
   const videoUrlInput = document.getElementById('video-url');
-  let videoUrl = videoUrlInput.value.trim(); // If the provided url is null, use the input value
-  if (!videoUrl) {
-    navigator.clipboard.readText()
-    .then(text => {
-      videoUrl = text.trim(); // Assign to the outer videoUrl variable, not re-declare it
-      videoUrlInput.value = videoUrl; // Update the input value
-    })
-    .catch(err => {
-      console.error('Failed to read clipboard contents: ', err);
-      alert('Please enter a video URL.');
-      return;
-    }); 
-  }
+  let videoUrl = videoUrlInput.value.trim();
+
   await filterLink(videoUrl)
   videoUrlInput.value = '';
 }
