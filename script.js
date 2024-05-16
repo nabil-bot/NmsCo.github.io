@@ -6,7 +6,7 @@ const speed = 1;
 // let playlistVideos = [];
 
 
-function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[]) { //videoUrl could be playlist url
+async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[]) { //videoUrl could be playlist url
   if (isPlaylist){
     videoId = getVideoId(playlistVideos[0]);
   }else{
@@ -150,16 +150,16 @@ function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVid
   }
 
   
-  function initializeYouTubeAPI(iframe, volume) {
+ function initializeYouTubeAPI(iframe, volume) {
     // delete YT
     const player = new YT.Player(iframe, {
       events: {
         'onReady': function (event) {
           event.target.setVolume(volume);
-          // players.push(event.target);
 
           if (players.indexOf(event) === -1) {
             players.push(event.target);
+            
           }
         },
         'onStateChange': function (event) {
@@ -172,8 +172,6 @@ function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVid
     });
   }
   initializeYouTubeAPI(iframe, volume);
-
-
 
 
   try {
@@ -193,24 +191,8 @@ function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVid
         // This block will be executed when an error occurs
         alert("An error occurred: " + error);
     }
-}
+} // finissing of the addVideoPlayer function
 
-// function initializeYouTubeAPI(iframe, volume) {
-//   const player = new YT.Player(iframe, {
-//     events: {
-//       'onReady': function (event) {
-//         event.target.setVolume(volume);
-//         players.push(event.target);
-//       },
-//       'onStateChange': function (event) {
-//         if (event.data === YT.PlayerState.ENDED) {
-//           playNextVideoFromPlaylist()
-//         }
-
-//       }
-//     }
-//   });
-// }
 
 async function addVideo() {
   const videoUrlInput = document.getElementById('video-url');
@@ -227,26 +209,9 @@ async function addVideo() {
       return;
     }); 
   }
-
-  // if (videoUrl.includes("&list=")){
-  //   getPlaylistVideos(videoUrl)
-  //   .then(urls => {
-  //     addVideoPlayer(videoUrl, volume, speed, true, urls); // No need to pass isPlaylist=true
-  //   })
-  //   .catch(error => {
-  //     console.error('Error:', error);
-  //     alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
-  //   });
-  // } else {
-  //   addVideoPlayer(videoUrl, volume, speed);
-  // }
   await filterLink(videoUrl)
-
-
   videoUrlInput.value = '';
 }
-
-
 
 
 function getPlaylistVideos(playlistUrl) {
@@ -254,8 +219,7 @@ function getPlaylistVideos(playlistUrl) {
     const playlistId = new URL(playlistUrl).searchParams.get('list');
     if (!playlistId) {
       reject('Invalid playlist URL. Please enter a valid URL with the "list" parameter.');
-      return;
-    }
+      return;}
     fetchVideosFromPlaylist(playlistId)
       .then(videoUrls => {
         resolve(videoUrls);
@@ -265,6 +229,8 @@ function getPlaylistVideos(playlistUrl) {
       });
   });
 }
+
+
 async function fetchVideosFromPlaylist(playlistId) {
   const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=AIzaSyDQkRgxuQ7i5-1UuYtuve8eZgAb1-XGe30`);
   const data = await response.json();
@@ -343,7 +309,6 @@ document.getElementById('paste-btn').addEventListener('click', pasteFromClipboar
 
 // Pause/Play video when visibility of the page changes
 document.addEventListener('visibilitychange', function () {
-
   var checkbox = document.getElementById('myCheckbox');
   if (checkbox.checked) {
   if (document.visibilityState === 'visible') {
@@ -408,46 +373,6 @@ function getCookie(name) {
 }
 
 
-// function filterLink(videoUrl){
-//   if (videoUrl.includes("&list=")){
-//     getPlaylistVideos(videoUrl)
-//     .then(urls => {
-//       addVideoPlayer(videoUrl, volume, speed, true, urls); // No need to pass isPlaylist=true
-//     })
-//     .catch(error => {
-//       console.error('Error:', error);
-//       alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
-//     });
-//   } else {
-//     addVideoPlayer(videoUrl, volume, speed);
-//   }
-// }
-
-
-// function initFunc() {
-//   var URLs = getCookie("URLs");
-//   if (URLs != null){
-//     for (const URL of URLs) {
-//       filterLink(URL);
-//     }
-//   }
-// }
-
-
-
-
-// document.getElementById("global-play-pause").addEventListener("click", function() {
-//   var icon = document.getElementById("global-play-pause");
-//   if (icon.classList.contains("fa-play")) {
-//     players.forEach(player => {player.playVideo();});
-//     icon.classList.remove("fa-play");
-//     icon.classList.add("fa-pause");
-//   } else {
-//     players.forEach(player => {player.pauseVideo();});
-//     icon.classList.remove("fa-pause");
-//     icon.classList.add("fa-play");
-//   }
-// });
 
 document.getElementById("global-play-pause").addEventListener("click", function() {
   var icon = document.getElementById("play-pause-icon");
@@ -466,10 +391,7 @@ document.getElementById("global-play-pause").addEventListener("click", function(
 
 
 
-
-
-
-function filterLink(videoUrl) {
+async function filterLink(videoUrl) {
   return new Promise((resolve, reject) => {
     if (videoUrl.includes("&list=")) {
       getPlaylistVideos(videoUrl)
@@ -496,6 +418,9 @@ async function initFunc() {
     for (const URL of URLs) {
       try {
         await filterLink(URL); // Await the completion of filterLink before moving to the next iteration
+        setTimeout(() => {
+          console.log("Waited 4 seconds!");
+        }, 2000);
       } catch (error) {
         console.error('Error processing URL:', error);
       }
