@@ -1,10 +1,17 @@
 let videoCount = 0;
 let players = [];
+const volume = 50;
+const speed = 1;
 // let currentPlaylistIndex = 0;
 // let playlistVideos = [];
 
 
-function addVideoPlayer(videoId, volume, speed, isPlaylist = false, playlistVideos=[]) {
+function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[]) { //videoUrl could be playlist url
+  if (isPlaylist){
+    videoId = getVideoId(playlistVideos[0]);
+  }else{
+    videoId = getVideoId(videoUrl);
+  }
   let currentPlaylistIndex=0
   const videosContainer = document.getElementById('videos-container');
   const videoWrapper = document.createElement('div');
@@ -98,13 +105,13 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false, playlistVide
     label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
     label.style.fontSize = '14px';
     videoControlsWrapper.appendChild(label);
-  }
+    }
 
   const removeButton = document.createElement('button');
   removeButton.textContent = '❌';
   removeButton.classList.add('remove-btn');
   removeButton.addEventListener('click', function () {
-    removeVideo(videoWrapper);
+    removeVideo(videoWrapper, videoUrl);
   });
   videoControlsWrapper.appendChild(removeButton);
   videoWrapper.appendChild(videoControlsWrapper);
@@ -164,8 +171,28 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false, playlistVide
       }
     });
   }
-
   initializeYouTubeAPI(iframe, volume);
+
+
+
+
+  try {
+        // This line will cause a ReferenceError because "videoUrl" is not defined
+        
+        var URLs = getCookie("URLs");
+        if (URLs != null){
+          if (!URLs.includes(videoUrl)){
+            URLs.push(videoUrl)
+            setCookie("URLs", URLs, 10);
+          }
+        } else{
+          setCookie("URLs", [videoUrl], 10);
+        }
+
+    } catch (error) {
+        // This block will be executed when an error occurs
+        alert("An error occurred: " + error);
+    }
 }
 
 // function initializeYouTubeAPI(iframe, volume) {
@@ -185,44 +212,43 @@ function addVideoPlayer(videoId, volume, speed, isPlaylist = false, playlistVide
 //   });
 // }
 
-function addVideo() {
-  const volume = 50;
-  const speed = 1;
+async function addVideo() {
   const videoUrlInput = document.getElementById('video-url');
-  let videoUrl = videoUrlInput.value.trim();
+  let videoUrl = videoUrlInput.value.trim(); // If the provided url is null, use the input value
   if (!videoUrl) {
     navigator.clipboard.readText()
     .then(text => {
-      document.getElementById('video-url').value = text.trim();
-      let videoUrl = text.trim();
-      return
+      videoUrl = text.trim(); // Assign to the outer videoUrl variable, not re-declare it
+      videoUrlInput.value = videoUrl; // Update the input value
     })
     .catch(err => {
       console.error('Failed to read clipboard contents: ', err);
       alert('Please enter a video URL.');
       return;
-    });
-    
+    }); 
   }
-  if (videoUrl.includes("&list=")){
-    getPlaylistVideos(videoUrl)
-    .then(urls => {
 
-      // if (videoCount == 0){
-      const videoId = getVideoId(urls[0]);
-      addVideoPlayer(videoId, volume, speed, isPlaylist=true, urls);
-    })
-    .catch(error => {
-      // Handle errors here
-      console.error('Error:', error);
-      alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
-    });
-  }else{
-  const videoId = getVideoId(videoUrl);
-  addVideoPlayer(videoId, volume, speed);
-  }
+  // if (videoUrl.includes("&list=")){
+  //   getPlaylistVideos(videoUrl)
+  //   .then(urls => {
+  //     addVideoPlayer(videoUrl, volume, speed, true, urls); // No need to pass isPlaylist=true
+  //   })
+  //   .catch(error => {
+  //     console.error('Error:', error);
+  //     alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
+  //   });
+  // } else {
+  //   addVideoPlayer(videoUrl, volume, speed);
+  // }
+  await filterLink(videoUrl)
+
+
   videoUrlInput.value = '';
 }
+
+
+
+
 function getPlaylistVideos(playlistUrl) {
   return new Promise((resolve, reject) => {
     const playlistId = new URL(playlistUrl).searchParams.get('list');
@@ -252,12 +278,28 @@ async function fetchVideosFromPlaylist(playlistId) {
   }
   return videoUrls;
 }
-function removeVideo(videoWrapper) {
+function removeVideo(videoWrapper, videoUrl) {
   const iframe = videoWrapper.querySelector('iframe');
   const videoId = iframe.src.split('/').pop().split('?')[0];
   players = players.filter(player => player.getVideoData().video_id !== videoId);
   videoWrapper.remove();
+  try {
+      var URLs = getCookie("URLs");
+      if (URLs !== null) {
+        if (URLs.includes(videoUrl)) {
+          const indexOfVideoUrl = URLs.indexOf(videoUrl);  // Store index for clarity
+          URLs.splice(indexOfVideoUrl, 1); // Remove the element at the found index
+          setCookie("URLs", URLs, 10); // Assuming setCookie takes value, expiry, path
+        } else {
+          alert(videoUrl + " is not found in URLs");
+        }
+      }
+  } catch (error) {
+      // This block will be executed when an error occurs
+      alert("An error occurred: " + error);
+  }
 }
+
 function getVideoId(url) {
   const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
   const match = url.match(regExp);
@@ -295,8 +337,6 @@ function pasteFromClipboard() {
     });
 }
 
-
-
 document.getElementById('add-video-btn').addEventListener('click', addVideo);
 document.getElementById('paste-btn').addEventListener('click', pasteFromClipboard);
 
@@ -322,3 +362,146 @@ document.addEventListener('visibilitychange', function () {
   }
 } 
 });
+
+// Check if cookies are enabled
+function areCookiesEnabled() {
+  var cookieEnabled = navigator.cookieEnabled;
+  if (!cookieEnabled) {
+      document.cookie = "testcookie";
+      cookieEnabled = document.cookie.indexOf("testcookie") !== -1;
+  }
+  return cookieEnabled;
+}
+
+// Function to set a cookie
+function setCookie(name, value, daysToExpire) {
+  var expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() + daysToExpire);
+  var cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value)) + "; expires=" + expirationDate.toUTCString() + "; path=/";
+  document.cookie = cookieValue;
+}
+
+// Function to get a cookie by name
+function getCookie(name) {
+  var cookieName = encodeURIComponent(name) + "=";
+  var cookieArray = document.cookie.split(';');
+  for (var i = 0; i < cookieArray.length; i++) {
+      var cookie = cookieArray[i].trim();
+      if (cookie.indexOf(cookieName) === 0) {
+          var cookieValue = cookie.substring(cookieName.length, cookie.length);
+          try {
+              // Try parsing the cookie value as JSON
+              var parsedValue = JSON.parse(decodeURIComponent(cookieValue));
+              // Check if the parsed value is an array
+              if (Array.isArray(parsedValue)) {
+                  return parsedValue; // Return the parsed array
+              } else {
+                  return [parsedValue]; // Return a new array with the parsed value as its only element
+              }
+          } catch (error) {
+              // If parsing fails, return the cookie value as is
+              return decodeURIComponent(cookieValue);
+          }
+      }
+  }
+  return null;
+}
+
+
+// function filterLink(videoUrl){
+//   if (videoUrl.includes("&list=")){
+//     getPlaylistVideos(videoUrl)
+//     .then(urls => {
+//       addVideoPlayer(videoUrl, volume, speed, true, urls); // No need to pass isPlaylist=true
+//     })
+//     .catch(error => {
+//       console.error('Error:', error);
+//       alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
+//     });
+//   } else {
+//     addVideoPlayer(videoUrl, volume, speed);
+//   }
+// }
+
+
+// function initFunc() {
+//   var URLs = getCookie("URLs");
+//   if (URLs != null){
+//     for (const URL of URLs) {
+//       filterLink(URL);
+//     }
+//   }
+// }
+
+
+
+
+// document.getElementById("global-play-pause").addEventListener("click", function() {
+//   var icon = document.getElementById("global-play-pause");
+//   if (icon.classList.contains("fa-play")) {
+//     players.forEach(player => {player.playVideo();});
+//     icon.classList.remove("fa-play");
+//     icon.classList.add("fa-pause");
+//   } else {
+//     players.forEach(player => {player.pauseVideo();});
+//     icon.classList.remove("fa-pause");
+//     icon.classList.add("fa-play");
+//   }
+// });
+
+document.getElementById("global-play-pause").addEventListener("click", function() {
+  var icon = document.getElementById("play-pause-icon");
+  if (icon.classList.contains("fa-play")) {
+    // Play functionality
+    players.forEach(player => {player.playVideo();});
+    icon.classList.remove("fa-play");
+    icon.classList.add("fa-pause");
+  } else {
+    // Pause functionality
+    players.forEach(player => {player.pauseVideo();});
+    icon.classList.remove("fa-pause");
+    icon.classList.add("fa-play");
+  }
+});
+
+
+
+
+
+
+function filterLink(videoUrl) {
+  return new Promise((resolve, reject) => {
+    if (videoUrl.includes("&list=")) {
+      getPlaylistVideos(videoUrl)
+      .then(urls => {
+        addVideoPlayer(videoUrl, volume, speed, true, urls); // No need to pass isPlaylist=true
+        resolve(); // Resolve the promise when processing is finished
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
+        reject(error); // Reject the promise if an error occurs
+      });
+    } else {
+      addVideoPlayer(videoUrl, volume, speed);
+      resolve(); // Resolve the promise when processing is finished
+    }
+  });
+}
+
+
+async function initFunc() {
+  var URLs = getCookie("URLs");
+  if (URLs != null) {
+    for (const URL of URLs) {
+      try {
+        await filterLink(URL); // Await the completion of filterLink before moving to the next iteration
+      } catch (error) {
+        console.error('Error processing URL:', error);
+      }
+    }
+  }
+}
+
+
+initFunc()

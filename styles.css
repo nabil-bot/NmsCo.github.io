@@ -25,9 +25,10 @@ h1 {
 .video-wrapper {
   margin: 5px;
   border: 1px solid #ccc;
-  padding: 8px;
+  padding: 5px;
   border-radius: 8px;
-  box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 6px 6px rgba(0, 0, 0, 0.1);
+  /* width: 100%; */
 }
 
 .video-wrapper iframe {
@@ -86,6 +87,11 @@ h1 {
     width: calc(50% - 20px);
     margin-top: 10px;
   }
+
+  .video-wrapper {
+    width: 100%;
+  }
+
 }
 
 
@@ -228,4 +234,26 @@ body {
 /* Optional: Hover effect for options */
 .video-speed-select option:hover {
   background-color: #f0f0f0; /* Change background color on hover */
+}
+
+
+#global-play-pause {
+  padding: 10px 20px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease-in-out; /* Smooth transition */
+  font-size: 18px;
+  /* Hover effect */
+  &:hover {
+    background-color: #0056b3; /* Darker shade of blue */
+  }
+
+  /* Click effect */
+  &:active {
+    background-color: #004080; /* Even darker shade of blue */
+  }
 }
