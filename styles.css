@@ -93,10 +93,13 @@ h1 {
     width: 100%;
     padding-left: 2%;
     padding-right: 2%;
+    padding-bottom: 3%;
 
   }
 
-    
+  #videos-container {
+    padding: 1px;
+  }
 
 }
 
@@ -173,7 +176,6 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 20px;
 }
 
 #controls {
