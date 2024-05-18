@@ -90,6 +90,7 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
 
     const nextButton = document.createElement('button');
     nextButton.textContent = '⏭';
+
     nextButton.classList.add('next-btn');
     nextButton.addEventListener('click', function () {
       playNextVideoFromPlaylist(videoWrapper);
@@ -128,13 +129,13 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
     label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
     const nextVideoUrl = playlistVideos[currentPlaylistIndex];
     const videoId = getVideoId(nextVideoUrl);
-    // const currentVideoWrapper = document.querySelector('.video-wrapper');
-    // const iframe = currentVideoWrapper.querySelector('iframe');
     const iframe = videoWrapper.querySelector('iframe');
     iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
     const slider = videoWrapper.querySelector('.slider');
     initializeYouTubeAPI(iframe, slider.value);
+    // alert("after init app")
   }
+
   function playPreviousVideoFromPlaylist(videoWrapper) {
     if (playlistVideos.length === 0) {
       return;
@@ -149,37 +150,7 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
     initializeYouTubeAPI(iframe, slider.value);
   }
 
-  
-//  function initializeYouTubeAPI(iframe, volume) {
-//     const player = new YT.Player(iframe, {
-//       events: {
-//         'onReady': function (event) {
-//           event.target.setVolume(volume);
-
-//           if (players.indexOf(event) === -1) {
-//             players.push(event.target);
-            
-//           }
-//         },
-//         'onStateChange': function (event) {
-//           if (event.data === YT.PlayerState.ENDED) {
-//             playNextVideoFromPlaylist(videoWrapper)
-//           }
-
-//         }
-//       }
-//     });
-//   }
-
-// initializeYouTubeAPI(iframe, volume);
-
-
 function initializeYouTubeAPI(iframe, volume) {
-  if (!iframe || typeof volume !== 'number') {
-    console.error('Invalid arguments provided to initializeYouTubeAPI');
-    return;
-  }
-
   function createPlayer() {
     const player = new YT.Player(iframe, {
       events: {
@@ -189,7 +160,7 @@ function initializeYouTubeAPI(iframe, volume) {
 
             if (players.indexOf(event.target) === -1) {
               players.push(event.target);
-              console.log('Player initialized and added to players array');
+              // console.log('Player initialized and added to players array');
             } else {
               console.log('Player already exists in players array');
             }
@@ -201,7 +172,7 @@ function initializeYouTubeAPI(iframe, volume) {
           try {
             if (event.data === YT.PlayerState.ENDED) {
               playNextVideoFromPlaylist(videoWrapper);
-              console.log('Video ended, playing next video from playlist');
+              // console.log('Video ended, playing next video from playlist');
             }
           } catch (error) {
             console.error('Error during onStateChange event:', error);
@@ -223,21 +194,18 @@ function initializeYouTubeAPI(iframe, volume) {
 
   function waitForYouTubeAPI() {
     if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
-      console.log('YouTube IFrame API is not yet loaded. Waiting...');
+      // console.log('YouTube IFrame API is not yet loaded. Waiting...');
       setTimeout(waitForYouTubeAPI, 100); // Retry after 100 milliseconds
     } else {
       createPlayer();
     }
   }
-
   waitForYouTubeAPI();
-}
-initializeYouTubeAPI(iframe, volume);
+} // initializeYouTubeAPI function ends here
+  initializeYouTubeAPI(iframe, volume);
   
 
   try {
-        // This line will cause a ReferenceError because "videoUrl" is not defined
-        
         var URLs = getCookie("URLs");
         if (URLs != null){
           if (!URLs.includes(videoUrl)){
