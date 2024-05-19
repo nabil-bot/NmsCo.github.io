@@ -501,15 +501,15 @@ function addAudioPlayer(url) {
 
   // Create custom controls
   const playPauseBtn = document.createElement('button');
-  playPauseBtn.textContent = 'Play';
+  playPauseBtn.textContent = '⏵';
   let isPlaying = false;
   playPauseBtn.addEventListener('click', () => {
     if (isPlaying) {
       audioPlayer.pause();
-      playPauseBtn.textContent = 'Play';
+      playPauseBtn.textContent = '⏵';
     } else {
       audioPlayer.play();
-      playPauseBtn.textContent = 'Pause';
+      playPauseBtn.textContent = '⏸';
     }
     isPlaying = !isPlaying;
   });
