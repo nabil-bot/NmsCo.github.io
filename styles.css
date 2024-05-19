@@ -25,22 +25,26 @@ h1 {
 
 .audio-container{
   width: 90%;
-  /* display: flex; */
-  /* flex-wrap: wrap; */
-  /* justify-content: center; */
   margin-top: 16px;
   margin: 5px;
   border: 1px solid #ccc;
   padding: 5px;
   border-radius: 8px;
   box-shadow: 1px 6px 6px rgba(0, 0, 0, 0.1);
-  justify-content: space-between;
+  
+
 }
 
 .audio-controls{
-  justify-content: space-between;
-  /* justify-content: center; */
+  justify-content: center; 
+  flex-direction: column;
+  gap: 10px;
+}
 
+.otherAudioControllersContainer{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 
@@ -210,6 +214,10 @@ body {
 
 /* Styling for small screens (mobile) */
 @media screen and (max-width: 600px) {
+
+
+
+
   header h1 {
     font-size: 20px;
   }
@@ -217,10 +225,22 @@ body {
 
 /* Styling for big screens (desktop) */
 @media screen and (min-width: 601px) {
+
+  .audio-container{
+    width: 40%;
+    margin-top: 16px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 1px 6px 6px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+  }
+
+
   header h1 {
     font-size: 28px;
   }
-
   #videos-container {
     padding: 40px;
   }
@@ -240,8 +260,6 @@ body {
   color: #333;
   
 }
-
-
 
 
 
@@ -390,7 +408,7 @@ audio::-webkit-media-controls-time-remaining-display {
 } */
 
 .audio-controls input[type="range"] {
-  width: 200px;
+  width: 100%;
   /* margin: 0 10px; */
 }
 
@@ -415,4 +433,50 @@ audio::-webkit-media-controls-time-remaining-display {
   padding: 10px;
   background-color: #f9f9f9;
 }
+
+.remove-container{
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.sliderContainer{
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Optional: Align items vertically center */
+  padding: 10px; 
+}
+
+
+
+.slider-container {
+  display: flex;
+  flex-direction: row;
+  /* width: 90%; */
+  padding: 10px;
+  background-color: #f0f0f0; /* Optional: Adds a background color */
+  border: 1px solid #ccc; /* Optional: Adds a border */
+  border-radius: 5px; /* Optional: Rounds the corners of the container */
+  margin-bottom: 5px;
+}
+
+.timeline-slider {
+  width: 90%;
+  margin-bottom: 10px; /* Adds space between the slider and the labels */
+
+}
+
+.timelabelContainer {
+  display: flex;
+  flex-direction: row;
+  /* height: 15px; */
+}
+
+.time-label {
+  font-size: 14px; /* Adjust font size as needed */
+}
+
+
+
+
 

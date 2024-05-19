@@ -485,9 +485,11 @@ function addAudioPlayer(url, name) {
     isPlaying = !isPlaying;
   });
 
+  const sliderContainer = document.createElement('div');
+  sliderContainer.classList.add('slider-container');
+
   const timelineSlider = document.createElement('input');
   timelineSlider.classList.add('timeline-slider');
-
   timelineSlider.type = 'range';
   timelineSlider.min = '0';
   timelineSlider.value = '0';
@@ -503,6 +505,18 @@ function addAudioPlayer(url, name) {
     audioPlayer.currentTime += 10;
   });
 
+  const forward30Sec = document.createElement('button');
+  forward30Sec.textContent = '+30s';
+  forward30Sec.addEventListener('click', () => {
+    audioPlayer.currentTime += 30;
+  });
+
+  const backward30Sec = document.createElement('button');
+  backward30Sec.textContent = '-30s';
+  backward30Sec.addEventListener('click', () => {
+    audioPlayer.currentTime -= 30;
+  });
+
   const backwardButton = document.createElement('button');
   backwardButton.textContent = '-10s';
   backwardButton.addEventListener('click', () => {
@@ -510,7 +524,7 @@ function addAudioPlayer(url, name) {
   });
 
   const speedSelect = document.createElement('select');
-  [0.5, 1, 1.5, 2].forEach(speed => {
+  [0.5, 0.75, 1, 1.15,1.25, 1.5, 1.75, 2].forEach(speed => {
     const option = document.createElement('option');
     option.value = speed;
     option.textContent = `${speed}x`;
@@ -546,10 +560,16 @@ function addAudioPlayer(url, name) {
   
   // Helper function to format time in MM:SS format
   const formatTime = (timeInSeconds) => {
-    const minutes = Math.floor(timeInSeconds / 60);
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
     const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
+
+    const formattedHours = hours > 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
+    const formattedMinutes = `${minutes < 10 ? '0' : ''}${minutes}`;
+    const formattedSeconds = `${seconds < 10 ? '0' : ''}${seconds}`;
+
+    return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
+};
 
   // Update current time label, timeline slider, and duration label
   audioPlayer.addEventListener('timeupdate', () => {
@@ -558,24 +578,45 @@ function addAudioPlayer(url, name) {
     timelineSlider.max = audioPlayer.duration; // Update slider max value with audio duration
     durationLabel.textContent = `/ ${formatTime(audioPlayer.duration)}`;
   });
+  const volumeControlerContainer = document.createElement('div');
+  volumeControlerContainer.classList.add('volumeControlerContainer');
+  
+  const otherAudioControllersContainer = document.createElement('div');
+  otherAudioControllersContainer.classList.add('otherAudioControllersContainer');
+  
 
-  
-  
-  audioContainer.appendChild(timelineSlider);
+
+  sliderContainer.appendChild(timelineSlider);
+
+
+  audioContainer.appendChild(sliderContainer);
   const audioControls = document.createElement('div');
   audioControls.classList.add('audio-controls');
   
-  audioContainer.appendChild(currentTimeLabel);
-  audioContainer.appendChild(durationLabel);
+  const timeLabelContainer = document.createElement('div');
+  timeLabelContainer.classList.add('timelabelContainer');
   
-  audioControls.appendChild(playPauseBtn);
+  timeLabelContainer.appendChild(currentTimeLabel);
+  timeLabelContainer.appendChild(durationLabel);
+
+  sliderContainer.appendChild(timeLabelContainer)
+  // audioContainer.appendChild(currentTimeLabel);
+  // audioContainer.appendChild(durationLabel);
   
-  audioControls.appendChild(backwardButton);
-  audioControls.appendChild(forwardButton);
-  audioControls.appendChild(speedSelect);
-  audioControls.appendChild(volumeContainer);
   
-  // audioControls.appendChild(durationLabel);
+  otherAudioControllersContainer.appendChild(playPauseBtn);
+  // otherAudioControllersContainer.appendChild(backward30Sec);
+  otherAudioControllersContainer.appendChild(backwardButton);
+  otherAudioControllersContainer.appendChild(forwardButton);
+  otherAudioControllersContainer.appendChild(forward30Sec);
+  
+
+  otherAudioControllersContainer.appendChild(speedSelect);
+
+  volumeControlerContainer.appendChild(volumeContainer);
+  
+  audioControls.appendChild(otherAudioControllersContainer);
+  audioControls.appendChild(volumeControlerContainer);
 
 
   const audioFileLabel = document.createElement('label');
@@ -593,12 +634,16 @@ function addAudioPlayer(url, name) {
   // videoControlsWrapper.appendChild(volumeContainer)
   // videoControlsWrapper.appendChild(removeButton);
 
+  const removeContainer = document.createElement('div');
+  removeContainer.classList.add('remove-container');
+  removeContainer.appendChild(audioFileLabel)
+  
+  removeContainer.appendChild(removeButton)
+
   audioContainer.appendChild(audioPlayer);
   audioContainer.appendChild(audioControls);
-
-  audioContainer.appendChild(audioFileLabel);
-
-  audioContainer.appendChild(removeButton);
+  // audioContainer.appendChild(audioFileLabel);
+  audioContainer.appendChild(removeContainer);
   
   videosContainer.appendChild(audioContainer);
 
@@ -610,18 +655,15 @@ fileInput.addEventListener('change', function(event) {
   if (file) {
       const url = URL.createObjectURL(file);
       if (file.type.startsWith('audio/')) {
-          addAudioPlayer(url, file.name)
+          addAudioPlayer(url, file.name);
+          alert(url);
       }
   }
 });
 
 
 const volumeSlider = document.getElementById('volumeSlider');
-
-        // Set the initial volume to match the slider
         audioPlayer.volume = volumeSlider.value;
-
-        // Update the audio volume when the slider value changes
         volumeSlider.addEventListener('input', (event) => {
             audioPlayer.volume = event.target.value;
         });
