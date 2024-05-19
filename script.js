@@ -656,7 +656,7 @@ fileInput.addEventListener('change', function(event) {
       const url = URL.createObjectURL(file);
       if (file.type.startsWith('audio/')) {
           addAudioPlayer(url, file.name);
-          alert(url);
+          // alert(url);
       }
   }
 });
