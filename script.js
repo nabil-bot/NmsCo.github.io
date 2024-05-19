@@ -24,13 +24,14 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
   iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true;
   videoWrapper.appendChild(iframe);
+  
+  
+  
   const volumeContainer = document.createElement('div');
   volumeContainer.classList.add('volume-container');
   const speakerIcon = document.createElement('i');
   speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
   volumeContainer.appendChild(speakerIcon);
-
-
   const volumeSlider = document.createElement('input');
   volumeSlider.type = 'range';
   volumeSlider.min = 0;
@@ -42,8 +43,6 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
   volumeSlider.addEventListener('input', function () {
     setVolume(videoWrapper, volumeSlider.value);
   });
-
-
   speakerIcon.addEventListener('click', function() {
     if (volumeSlider.value > 0){
       setVolume(videoWrapper, 0);
@@ -449,3 +448,187 @@ async function initFunc() {
 
 
 initFunc()
+
+
+const fileInput = document.getElementById('file-input');
+
+// function addAudioPlayer(url){
+//   const audioPlayer = document.createElement('audio');
+//   const videosContainer = document.getElementById('videos-container');
+//   const videoWrapper = document.createElement('div');
+//   videoWrapper.classList.add('video-wrapper');
+//   // audioPlayer.style.display = 'block';
+//   audioPlayer.src = url;
+//   // audioPlayer.setAttribute('controls', '');
+//   audioPlayer.play();
+//   videoWrapper.appendChild(audioPlayer)
+
+//   const volumeContainer = document.createElement('div');
+//   volumeContainer.classList.add('volume-container');
+//   const speakerIcon = document.createElement('i');
+//   speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
+//   volumeContainer.appendChild(speakerIcon);
+//   const volumeSlider = document.createElement('input');
+//   volumeSlider.type = 'range';
+//   volumeSlider.min = 0;
+//   volumeSlider.max = 1;
+//   volumeSlider.value = 0.8;
+//   volumeSlider.step = 0.01
+//   volumeSlider.classList.add('slider');
+//   volumeContainer.appendChild(volumeSlider);
+//   videoWrapper.appendChild(volumeContainer);
+//   volumeSlider.addEventListener('input', function () {
+//     audioPlayer.volume = volumeSlider.value;
+//   });
+//   const videoControlsWrapper = document.createElement('div');
+//   videoControlsWrapper.classList.add('video-controls');
+//   const removeButton = document.createElement('button');
+//   removeButton.textContent = '❌';
+//   removeButton.classList.add('remove-btn');
+//   removeButton.addEventListener('click', function () {
+//     videoWrapper.remove();
+//     fileInput.value = '';
+//   });
+//   videoControlsWrapper.appendChild(volumeContainer)
+//   videoControlsWrapper.appendChild(removeButton);
+//   videoWrapper.appendChild(videoControlsWrapper)
+//   videosContainer.appendChild(videoWrapper)
+// }
+function addAudioPlayer(url) {
+  const audioPlayer = document.createElement('audio');
+  audioPlayer.src = url;
+  audioPlayer.controls = false; // Disable default controls
+
+  // Create custom controls
+  const playPauseBtn = document.createElement('button');
+  playPauseBtn.textContent = 'Play';
+  let isPlaying = false;
+  playPauseBtn.addEventListener('click', () => {
+    if (isPlaying) {
+      audioPlayer.pause();
+      playPauseBtn.textContent = 'Play';
+    } else {
+      audioPlayer.play();
+      playPauseBtn.textContent = 'Pause';
+    }
+    isPlaying = !isPlaying;
+  });
+
+  const timelineSlider = document.createElement('input');
+  timelineSlider.type = 'range';
+  timelineSlider.min = '0';
+  timelineSlider.value = '0';
+  timelineSlider.step = '1';
+
+  timelineSlider.addEventListener('input', () => {
+    audioPlayer.currentTime = timelineSlider.value;
+  });
+
+  const forwardButton = document.createElement('button');
+  forwardButton.textContent = '+10s';
+  forwardButton.addEventListener('click', () => {
+    audioPlayer.currentTime += 10;
+  });
+
+  const backwardButton = document.createElement('button');
+  backwardButton.textContent = '-10s';
+  backwardButton.addEventListener('click', () => {
+    audioPlayer.currentTime -= 10;
+  });
+
+  const speedSelect = document.createElement('select');
+  [0.5, 1, 1.5, 2].forEach(speed => {
+    const option = document.createElement('option');
+    option.value = speed;
+    option.textContent = `${speed}x`;
+    speedSelect.appendChild(option);
+  });
+  speedSelect.addEventListener('change', () => {
+    audioPlayer.playbackRate = speedSelect.value;
+  });
+
+  const volumeContainer = document.createElement('div');
+  volumeContainer.classList.add('volume-container');
+  const speakerIcon = document.createElement('i');
+  speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
+  volumeContainer.appendChild(speakerIcon);
+  const volumeSlider = document.createElement('input');
+  volumeSlider.type = 'range';
+  volumeSlider.min = 0;
+  volumeSlider.max = 1;
+  volumeSlider.value = 0.8;
+  volumeSlider.step = 0.01;
+  volumeSlider.classList.add('slider');
+  volumeContainer.appendChild(volumeSlider);
+  volumeSlider.addEventListener('input', () => {
+    audioPlayer.volume = volumeSlider.value;
+  });
+
+  const currentTimeLabel = document.createElement('span');
+
+  const durationLabel = document.createElement('span');
+  durationLabel.textContent = '/ 00:00'; // Initialize duration label
+
+  const fileNameLabel = document.createElement('span');
+  fileNameLabel.textContent = 'File: ' + url.split('/').pop(); // Extract filename from URL
+
+  // Helper function to format time in MM:SS format
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  // Update current time label, timeline slider, and duration label
+  audioPlayer.addEventListener('timeupdate', () => {
+    currentTimeLabel.textContent = formatTime(audioPlayer.currentTime);
+    timelineSlider.value = audioPlayer.currentTime; // Update slider value with current time
+    timelineSlider.max = audioPlayer.duration; // Update slider max value with audio duration
+    durationLabel.textContent = `/ ${formatTime(audioPlayer.duration)}`;
+  });
+
+  const audioControls = document.createElement('div');
+  audioControls.classList.add('audio-controls');
+  audioControls.appendChild(playPauseBtn);
+  audioControls.appendChild(timelineSlider);
+  audioControls.appendChild(backwardButton);
+  audioControls.appendChild(forwardButton);
+  audioControls.appendChild(speedSelect);
+  audioControls.appendChild(volumeContainer);
+  audioControls.appendChild(currentTimeLabel);
+  audioControls.appendChild(durationLabel);
+  audioControls.appendChild(fileNameLabel);
+
+  const audioContainer = document.createElement('div');
+  audioContainer.classList.add('audio-container');
+  audioContainer.appendChild(audioPlayer);
+  audioContainer.appendChild(audioControls);
+
+  const videosContainer = document.getElementById('videos-container');
+  videosContainer.appendChild(audioContainer);
+}
+
+
+
+
+
+fileInput.addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (file) {
+      const url = URL.createObjectURL(file);
+      if (file.type.startsWith('audio/')) {
+          addAudioPlayer(url)
+      }
+  }
+});
+
+
+const volumeSlider = document.getElementById('volumeSlider');
+
+        // Set the initial volume to match the slider
+        audioPlayer.volume = volumeSlider.value;
+
+        // Update the audio volume when the slider value changes
+        volumeSlider.addEventListener('input', (event) => {
+            audioPlayer.volume = event.target.value;
+        });

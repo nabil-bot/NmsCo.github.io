@@ -273,3 +273,59 @@ body {
   margin: 3px;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Style for the audio element */
+audio {
+  display: block;
+  width: 320px; /* Set your preferred width */
+  margin: 20px auto; /* Center the audio element */
+  background-color: #f3f3f3;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Style for the audio controls */
+audio::-webkit-media-controls-panel {
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.7);
+  position: relative;
+}
+
+/* Style for the audio timeline control */
+audio::-webkit-media-controls-timeline {
+  width: 85%; /* Take the whole width */
+  position: absolute;
+  bottom: 30px; /* Adjust top position to create space */
+}
+
+/* Style for the audio control buttons */
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-pause-button,
+audio::-webkit-media-controls-volume-slider {
+  filter: invert(1); /* Invert button colors */
+}
+
+/* Style for the audio time display */
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+  color: #fff;
+  font-size: 12px;
+  margin: 0 5px;
+}
