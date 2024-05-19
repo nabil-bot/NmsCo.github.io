@@ -452,70 +452,42 @@ initFunc()
 
 const fileInput = document.getElementById('file-input');
 
-// function addAudioPlayer(url){
-//   const audioPlayer = document.createElement('audio');
-//   const videosContainer = document.getElementById('videos-container');
-//   const videoWrapper = document.createElement('div');
-//   videoWrapper.classList.add('video-wrapper');
-//   // audioPlayer.style.display = 'block';
-//   audioPlayer.src = url;
-//   // audioPlayer.setAttribute('controls', '');
-//   audioPlayer.play();
-//   videoWrapper.appendChild(audioPlayer)
-
-//   const volumeContainer = document.createElement('div');
-//   volumeContainer.classList.add('volume-container');
-//   const speakerIcon = document.createElement('i');
-//   speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
-//   volumeContainer.appendChild(speakerIcon);
-//   const volumeSlider = document.createElement('input');
-//   volumeSlider.type = 'range';
-//   volumeSlider.min = 0;
-//   volumeSlider.max = 1;
-//   volumeSlider.value = 0.8;
-//   volumeSlider.step = 0.01
-//   volumeSlider.classList.add('slider');
-//   volumeContainer.appendChild(volumeSlider);
-//   videoWrapper.appendChild(volumeContainer);
-//   volumeSlider.addEventListener('input', function () {
-//     audioPlayer.volume = volumeSlider.value;
-//   });
-//   const videoControlsWrapper = document.createElement('div');
-//   videoControlsWrapper.classList.add('video-controls');
-//   const removeButton = document.createElement('button');
-//   removeButton.textContent = '❌';
-//   removeButton.classList.add('remove-btn');
-//   removeButton.addEventListener('click', function () {
-//     videoWrapper.remove();
-//     fileInput.value = '';
-//   });
-//   videoControlsWrapper.appendChild(volumeContainer)
-//   videoControlsWrapper.appendChild(removeButton);
-//   videoWrapper.appendChild(videoControlsWrapper)
-//   videosContainer.appendChild(videoWrapper)
-// }
-function addAudioPlayer(url) {
+function addAudioPlayer(url, name) {
   const videosContainer = document.getElementById('videos-container');
+  const audioContainer = document.createElement('div');
+  audioContainer.classList.add('audio-container');
+
   const audioPlayer = document.createElement('audio');
   audioPlayer.src = url;
   audioPlayer.controls = false; // Disable default controls
 
+
+
+  // const videoWrapper = document.createElement('div');
+  // videoWrapper.classList.add('video-wrapper');
+
   // Create custom controls
   const playPauseBtn = document.createElement('button');
-  playPauseBtn.textContent = 'play';
+  playPauseBtn.classList.add('audio-play-pause');
+
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   let isPlaying = false;
   playPauseBtn.addEventListener('click', () => {
     if (isPlaying) {
       audioPlayer.pause();
-      playPauseBtn.textContent = 'play';
+
+      playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
     } else {
       audioPlayer.play();
-      playPauseBtn.textContent = 'pause';
+
+      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     }
     isPlaying = !isPlaying;
   });
 
   const timelineSlider = document.createElement('input');
+  timelineSlider.classList.add('timeline-slider');
+
   timelineSlider.type = 'range';
   timelineSlider.min = '0';
   timelineSlider.value = '0';
@@ -544,6 +516,7 @@ function addAudioPlayer(url) {
     option.textContent = `${speed}x`;
     speedSelect.appendChild(option);
   });
+  speedSelect.value = 1
   speedSelect.addEventListener('change', () => {
     audioPlayer.playbackRate = speedSelect.value;
   });
@@ -568,11 +541,9 @@ function addAudioPlayer(url) {
   const currentTimeLabel = document.createElement('span');
 
   const durationLabel = document.createElement('span');
-  durationLabel.textContent = '/ 00:00'; // Initialize duration label
+  durationLabel.textContent = '/ 0:0'; // Initialize duration label
 
-  const fileNameLabel = document.createElement('span');
-  fileNameLabel.textContent = 'File: ' + url.split('/').pop(); // Extract filename from URL
-
+  
   // Helper function to format time in MM:SS format
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
@@ -588,27 +559,35 @@ function addAudioPlayer(url) {
     durationLabel.textContent = `/ ${formatTime(audioPlayer.duration)}`;
   });
 
+  
+  
+  audioContainer.appendChild(timelineSlider);
   const audioControls = document.createElement('div');
   audioControls.classList.add('audio-controls');
+  
+  audioContainer.appendChild(currentTimeLabel);
+  audioContainer.appendChild(durationLabel);
+  
   audioControls.appendChild(playPauseBtn);
-  audioControls.appendChild(timelineSlider);
+  
   audioControls.appendChild(backwardButton);
   audioControls.appendChild(forwardButton);
   audioControls.appendChild(speedSelect);
   audioControls.appendChild(volumeContainer);
-  audioControls.appendChild(currentTimeLabel);
-  audioControls.appendChild(durationLabel);
-  audioControls.appendChild(fileNameLabel);
+  
+  // audioControls.appendChild(durationLabel);
 
-  const audioContainer = document.createElement('div');
-  audioContainer.classList.add('audio-container');
+
+  const audioFileLabel = document.createElement('label');
+  audioFileLabel.textContent = name;
+  audioFileLabel.classList.add('AudioFileName');
 
 
     const removeButton = document.createElement('button');
   removeButton.textContent = '❌';
   removeButton.classList.add('remove-btn');
   removeButton.addEventListener('click', function () {
-    videosContainer.remove();
+    audioContainer.remove();
     fileInput.value = '';
   });
   // videoControlsWrapper.appendChild(volumeContainer)
@@ -617,14 +596,13 @@ function addAudioPlayer(url) {
   audioContainer.appendChild(audioPlayer);
   audioContainer.appendChild(audioControls);
 
+  audioContainer.appendChild(audioFileLabel);
+
+  audioContainer.appendChild(removeButton);
   
   videosContainer.appendChild(audioContainer);
-  videosContainer.appendChild(removeButton);
 
 }
-
-
-
 
 
 fileInput.addEventListener('change', function(event) {
@@ -632,7 +610,7 @@ fileInput.addEventListener('change', function(event) {
   if (file) {
       const url = URL.createObjectURL(file);
       if (file.type.startsWith('audio/')) {
-          addAudioPlayer(url)
+          addAudioPlayer(url, file.name)
       }
   }
 });

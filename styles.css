@@ -16,11 +16,36 @@ h1 {
   margin: 0;
 }
 
-#videos-container {
+#videos-container{
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   margin-top: 16px;
+}
+
+.audio-container{
+  width: 90%;
+  /* display: flex; */
+  /* flex-wrap: wrap; */
+  /* justify-content: center; */
+  margin-top: 16px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 1px 6px 6px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+}
+
+.audio-controls{
+  justify-content: space-between;
+  /* justify-content: center; */
+
+}
+
+
+.timeline-slider{
+  width: 65%;
 }
 
 .video-wrapper {
@@ -310,7 +335,7 @@ audio::-webkit-media-controls-panel {
 
 /* Style for the audio timeline control */
 audio::-webkit-media-controls-timeline {
-  width: 85%; /* Take the whole width */
+  width: 100%; /* Take the whole width */
   position: absolute;
   bottom: 30px; /* Adjust top position to create space */
 }
@@ -329,3 +354,65 @@ audio::-webkit-media-controls-time-remaining-display {
   font-size: 12px;
   margin: 0 5px;
 }
+
+
+.AudioFileName{
+  font-weight: 700;
+  font-size: 16px;
+  width: 100%;
+  flex-grow: 1;
+}
+
+
+
+
+
+.audio-controls {
+  display: flex; 
+  /* align-items: center; */
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+}
+
+/* .audio-controls button {
+  padding: 6px 2px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+} */
+
+/* .audio-controls button:hover {
+  background-color: #0056b3;
+} */
+
+.audio-controls input[type="range"] {
+  width: 200px;
+  /* margin: 0 10px; */
+}
+
+.audio-controls select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.audio-play-pause{
+  padding: 8px 16px;
+
+}
+
+
+
+.group-container {
+  margin-top: 20px;
+  padding-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
