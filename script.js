@@ -495,21 +495,22 @@ const fileInput = document.getElementById('file-input');
 //   videosContainer.appendChild(videoWrapper)
 // }
 function addAudioPlayer(url) {
+  const videosContainer = document.getElementById('videos-container');
   const audioPlayer = document.createElement('audio');
   audioPlayer.src = url;
   audioPlayer.controls = false; // Disable default controls
 
   // Create custom controls
   const playPauseBtn = document.createElement('button');
-  playPauseBtn.textContent = '⏵';
+  playPauseBtn.textContent = 'play';
   let isPlaying = false;
   playPauseBtn.addEventListener('click', () => {
     if (isPlaying) {
       audioPlayer.pause();
-      playPauseBtn.textContent = '⏵';
+      playPauseBtn.textContent = 'play';
     } else {
       audioPlayer.play();
-      playPauseBtn.textContent = '⏸';
+      playPauseBtn.textContent = 'pause';
     }
     isPlaying = !isPlaying;
   });
@@ -601,11 +602,25 @@ function addAudioPlayer(url) {
 
   const audioContainer = document.createElement('div');
   audioContainer.classList.add('audio-container');
+
+
+    const removeButton = document.createElement('button');
+  removeButton.textContent = '❌';
+  removeButton.classList.add('remove-btn');
+  removeButton.addEventListener('click', function () {
+    videosContainer.remove();
+    fileInput.value = '';
+  });
+  // videoControlsWrapper.appendChild(volumeContainer)
+  // videoControlsWrapper.appendChild(removeButton);
+
   audioContainer.appendChild(audioPlayer);
   audioContainer.appendChild(audioControls);
 
-  const videosContainer = document.getElementById('videos-container');
+  
   videosContainer.appendChild(audioContainer);
+  videosContainer.appendChild(removeButton);
+
 }
 
 
