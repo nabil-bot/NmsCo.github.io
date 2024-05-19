@@ -408,48 +408,6 @@ document.getElementById("global-play-pause").addEventListener("click", function(
 });
 
 
-
-async function filterLink(videoUrl) {
-  return new Promise((resolve, reject) => {
-    if (videoUrl.includes("&list=")) {
-      getPlaylistVideos(videoUrl)
-      .then(urls => {
-        addVideoPlayer(videoUrl, volume, speed, true, urls); // No need to pass isPlaylist=true
-        resolve(); // Resolve the promise when processing is finished
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
-        reject(error); // Reject the promise if an error occurs
-      });
-    } else {
-      addVideoPlayer(videoUrl, volume, speed);
-      resolve(); // Resolve the promise when processing is finished
-    }
-  });
-}
-
-
-async function initFunc() {
-  var URLs = getCookie("URLs");
-  if (URLs != null) {
-    for (const URL of URLs) {
-      try {
-        await filterLink(URL); // Await the completion of filterLink before moving to the next iteration
-        setTimeout(() => {
-          console.log("Waited 4 seconds!");
-        }, 2000);
-      } catch (error) {
-        console.error('Error processing URL:', error);
-      }
-    }
-  }
-}
-
-
-initFunc()
-
-
 const fileInput = document.getElementById('file-input');
 
 function addAudioPlayer(url, name) {
@@ -461,12 +419,6 @@ function addAudioPlayer(url, name) {
   audioPlayer.src = url;
   audioPlayer.controls = false; // Disable default controls
 
-
-
-  // const videoWrapper = document.createElement('div');
-  // videoWrapper.classList.add('video-wrapper');
-
-  // Create custom controls
   const playPauseBtn = document.createElement('button');
   playPauseBtn.classList.add('audio-play-pause');
 
@@ -479,7 +431,6 @@ function addAudioPlayer(url, name) {
       playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
     } else {
       audioPlayer.play();
-
       playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     }
     isPlaying = !isPlaying;
@@ -630,6 +581,23 @@ function addAudioPlayer(url, name) {
   removeButton.addEventListener('click', function () {
     audioContainer.remove();
     fileInput.value = '';
+
+
+    //   try {
+    //     var URLs = getCookie("URLs");
+    //     if (URLs !== null) {
+    //       if (URLs.includes()) {
+    //         const indexOfVideoUrl = URLs.indexOf();  // Store index for clarity
+    //         URLs.splice(indexOfVideoUrl, 1); // Remove the element at the found index
+    //         setCookie("URLs", URLs, 10); // Assuming setCookie takes value, expiry, path
+    //       } else {
+    //         alert(videoUrl + " is not found in URLs");
+    //       }
+    //     }
+    // } catch (error) {
+    //     // This block will be executed when an error occurs
+    //     alert("An error occurred: " + error);
+    // }
   });
   // videoControlsWrapper.appendChild(volumeContainer)
   // videoControlsWrapper.appendChild(removeButton);
@@ -647,7 +615,52 @@ function addAudioPlayer(url, name) {
   
   videosContainer.appendChild(audioContainer);
 
+
+//   try {
+//     var URLs = getCookie("URLs");
+
+//     if (URLs != null){
+//       if (!URLs.includes(url)){
+//         URLs.push(url)
+//         setCookie("URLs", URLs, 10);
+//       }
+//     } else{
+//       setCookie("URLs", [url], 10);
+//     }
+// } catch (error) {
+//     // This block will be executed when an error occurs
+//     alert("An error occurred: " + error);
+// }
+
 }
+
+
+async function filterLink(videoUrl) {
+  return new Promise((resolve, reject) => {
+    if (videoUrl.includes("&list=")) {
+      getPlaylistVideos(videoUrl)
+      .then(urls => {
+        addVideoPlayer(videoUrl, volume, speed, true, urls); // No need to pass isPlaylist=true
+        resolve(); // Resolve the promise when processing is finished
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
+        reject(error); // Reject the promise if an error occurs
+      });
+    }else if (videoUrl.includes("blob:")){
+      addAudioPlayer(videoUrl, "")
+    }else {
+      addVideoPlayer(videoUrl, volume, speed);
+      resolve(); // Resolve the promise when processing is finished
+    }
+  });
+}
+
+
+
+
+
 
 
 fileInput.addEventListener('change', function(event) {
@@ -656,14 +669,34 @@ fileInput.addEventListener('change', function(event) {
       const url = URL.createObjectURL(file);
       if (file.type.startsWith('audio/')) {
           addAudioPlayer(url, file.name);
-          alert(url);
       }
   }
 });
 
 
-const volumeSlider = document.getElementById('volumeSlider');
-        audioPlayer.volume = volumeSlider.value;
-        volumeSlider.addEventListener('input', (event) => {
-            audioPlayer.volume = event.target.value;
-        });
+// const volumeSlider = document.getElementById('volumeSlider');
+// audioPlayer.volume = volumeSlider.value;
+// volumeSlider.addEventListener('input', (event) => {
+//     audioPlayer.volume = event.target.value;
+// });
+
+
+
+
+async function initFunc() {
+  var URLs = getCookie("URLs");
+  if (URLs != null) {
+    for (const URL of URLs) {
+      try {
+        await filterLink(URL); // Await the completion of filterLink before moving to the next iteration
+        setTimeout(() => {
+        }, 1000);
+      } catch (error) {
+        console.error('Error processing URL:', error);
+      }
+    }
+  }
+}
+
+
+initFunc()
