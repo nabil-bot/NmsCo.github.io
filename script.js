@@ -6,7 +6,31 @@ const speed = 1;
 // let playlistVideos = [];
 
 
-async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[]) { //videoUrl could be playlist url
+function setUrlDicProperty(videoUrl, key, value){
+  try {
+    var urlDic = getCookie("urlDic");
+    if (urlDic != null){
+      if (videoUrl in urlDic){
+        urlDic[videoUrl][key] = value
+        setCookie("urlDic", urlDic, 10);
+      }
+    } else{
+      var urlDic = {};
+      var urlProperties = {};
+      urlProperties["volume"] = 60
+      urlProperties["timeFrame"] = 0
+      urlDic[videoUrl] = urlProperties
+      setCookie("urlDic", urlDic, 10);
+      urlDic = getCookie("urlDic");
+    }
+
+} catch (error) {
+    alert("An error occurred: " + error);
+}
+} 
+
+
+async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[], timeFrame=0) { //videoUrl could be playlist url
   if (isPlaylist){
     videoId = getVideoId(playlistVideos[0]);
   }else{
@@ -40,6 +64,14 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
   videoWrapper.appendChild(volumeContainer);
   volumeSlider.addEventListener('input', function () {
     setVolume(videoWrapper, volumeSlider.value);
+
+    var urlDic = getCookie("urlDic");
+    if (urlDic !== null) {
+      if (videoUrl in urlDic){
+        urlDic[videoUrl]["volume"] = volumeSlider.value;
+        setCookie("urlDic", urlDic, 10);
+      } 
+    }
   });
   speakerIcon.addEventListener('click', function() {
     if (volumeSlider.value > 0){
@@ -111,6 +143,17 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
   removeButton.classList.add('remove-btn');
   removeButton.addEventListener('click', function () {
     removeVideo(videoWrapper, videoUrl);
+    
+    var urlDic = getCookie("urlDic");
+    if (urlDic != null){
+        if (videoUrl in urlDic){
+          delete urlDic[videoUrl]
+          if (Object.keys(urlDic).length == 0){
+              deleteCookie("urlDic");
+          }else{
+              setCookie("urlDic", urlDic, 10);
+          }
+        }} 
   });
   videoControlsWrapper.appendChild(removeButton);
   videoWrapper.appendChild(videoControlsWrapper);
@@ -148,17 +191,16 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
     initializeYouTubeAPI(iframe, slider.value);
   }
 
-function initializeYouTubeAPI(iframe, volume) {
+function initializeYouTubeAPI(iframe, volume, timeFrame) {
   function createPlayer() {
     const player = new YT.Player(iframe, {
       events: {
         'onReady': function (event) {
           try {
             event.target.setVolume(volume);
-
+            event.target.seekTo(timeFrame);
             if (players.indexOf(event.target) === -1) {
               players.push(event.target);
-              // console.log('Player initialized and added to players array');
             } else {
               console.log('Player already exists in players array');
             }
@@ -171,6 +213,21 @@ function initializeYouTubeAPI(iframe, volume) {
             if (event.data === YT.PlayerState.ENDED) {
               playNextVideoFromPlaylist(videoWrapper);
               // console.log('Video ended, playing next video from playlist');
+            } else if (event.data === YT.PlayerState.PAUSED){
+
+                var urlDic = getCookie("urlDic");
+                if (urlDic != null){
+                  if (videoUrl in urlDic)
+
+                    var floatNumber = player.getCurrentTime();
+                    var intNumber = Math.floor(floatNumber);   
+                    urlDic[videoUrl]["timeFrame"]=  intNumber;
+                    setCookie("urlDic", urlDic, 10);
+                    console.log(urlDic[videoUrl]["timeFrame"])
+                }
+
+              // setUrlDicProperty(videoUrl, "timeFrame", intNumber)
+
             }
           } catch (error) {
             console.error('Error during onStateChange event:', error);
@@ -200,37 +257,46 @@ function initializeYouTubeAPI(iframe, volume) {
   }
   waitForYouTubeAPI();
 } // initializeYouTubeAPI function ends here
-  initializeYouTubeAPI(iframe, volume);
+  initializeYouTubeAPI(iframe, volume, timeFrame);
   
-
+  
   try {
-        var URLs = getCookie("URLs");
-        if (URLs != null){
-          if (!URLs.includes(videoUrl)){
-            URLs.push(videoUrl)
-            setCookie("URLs", URLs, 10);
+        var urlDic = getCookie("urlDic");
+        if (urlDic != null){
+          if (!(videoUrl in urlDic)){
+            alert("not in the dic")
+            var urlProperties = {}
+            urlProperties["timeFrame"] = timeFrame
+            urlProperties["volume"] = volume
+            urlDic[videoUrl] = urlProperties
+            setCookie("urlDic", urlDic, 10);
+            alert(Object.keys(urlDic).length)
           }
         } else{
-          setCookie("URLs", [videoUrl], 10);
+          var urlDic = {};
+          var urlProperties = {};
+          urlProperties["volume"] = 1
+          urlProperties["timeFrame"] = 0
+          urlDic[videoUrl] = urlProperties
+          setCookie("urlDic", urlDic, 10);
+          urlDic = getCookie("urlDic");
         }
 
+
     } catch (error) {
-        // This block will be executed when an error occurs
         alert("An error occurred: " + error);
     }
 } // finissing of the addVideoPlayer function
 
 
 async function addVideo() {
-  
   const videoUrlInput = document.getElementById('video-url');
   let videoUrl = videoUrlInput.value.trim();
-
-  await filterLink(videoUrl)
+  await filterLink(videoUrl, 60,0)
   videoUrlInput.value = '';
 }
 
-
+// addvideo ends here
 function getPlaylistVideos(playlistUrl) {
   return new Promise((resolve, reject) => {
     const playlistId = new URL(playlistUrl).searchParams.get('list');
@@ -285,6 +351,7 @@ function removeVideo(videoWrapper, videoUrl) {
 
 function getVideoId(url) {
   const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
+  
   const match = url.match(regExp);
 
   if (match && match[1]) {
@@ -354,8 +421,6 @@ function areCookiesEnabled() {
   }
   return cookieEnabled;
 }
-
-// Function to set a cookie
 function setCookie(name, value, daysToExpire) {
   var expirationDate = new Date();
   expirationDate.setDate(expirationDate.getDate() + daysToExpire);
@@ -363,79 +428,44 @@ function setCookie(name, value, daysToExpire) {
   document.cookie = cookieValue;
 }
 
-// function setCookie(name, value, daysToExpire) {
-//   var expirationDate = new Date();
-//   expirationDate.setDate(expirationDate.getDate() + daysToExpire);
-//   var cookieValue;
-  
-//   // Check if the value is an object (dictionary)
-//   if (typeof value === 'object' && !Array.isArray(value)) {
-//     cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value)) + "; expires=" + expirationDate.toUTCString() + "; path=/";
-//   } else {
-//     // If the value is not an object or is an array, save it as is
-//     cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(value) + "; expires=" + expirationDate.toUTCString() + "; path=/";
-//   }
-  
-//   document.cookie = cookieValue;
-// }
-
-
-
-// Function to get a cookie by name
-// function getCookie(name) {
-//   var cookieName = encodeURIComponent(name) + "=";
-//   var cookieArray = document.cookie.split(';');
-//   for (var i = 0; i < cookieArray.length; i++) {
-//       var cookie = cookieArray[i].trim();
-//       if (cookie.indexOf(cookieName) === 0) {
-//           var cookieValue = cookie.substring(cookieName.length, cookie.length);
-//           try {
-//               // Try parsing the cookie value as JSON
-//               var parsedValue = JSON.parse(decodeURIComponent(cookieValue));
-//               // Check if the parsed value is an array
-//               if (Array.isArray(parsedValue)) {
-//                   return parsedValue; // Return the parsed array
-//               } else {
-//                   return [parsedValue]; // Return a new array with the parsed value as its only element
-//               }
-//           } catch (error) {
-//               // If parsing fails, return the cookie value as is
-//               return decodeURIComponent(cookieValue);
-//           }
-//       }
-//   }
-//   return null;
-// }
-
-
-
 function getCookie(name) {
   var cookieName = encodeURIComponent(name) + "=";
   var cookieArray = document.cookie.split(';');
   for (var i = 0; i < cookieArray.length; i++) {
-      var cookie = cookieArray[i].trim();
-      if (cookie.indexOf(cookieName) === 0) {
-          var cookieValue = cookie.substring(cookieName.length, cookie.length);
-          try {
-              // Try parsing the cookie value as JSON
-              var parsedValue = JSON.parse(decodeURIComponent(cookieValue));
-              // Check if the parsed value is an object (and not an array)
-              if (typeof parsedValue === 'object' && !Array.isArray(parsedValue)) {
-                  return parsedValue; // Return the parsed object
-              } else if (Array.isArray(parsedValue)) {
-                  return parsedValue; // Return the parsed array
-              } else {
-                  return parsedValue; // Return the parsed value if it's a primitive type
-              }
-          } catch (error) {
-              // If parsing fails, return the cookie value as is
-              return decodeURIComponent(cookieValue);
-          }
+    var cookie = cookieArray[i].trim();
+    if (cookie.indexOf(cookieName) === 0) {
+      var cookieValue = cookie.substring(cookieName.length, cookie.length);
+      try {
+        return JSON.parse(decodeURIComponent(cookieValue));
+      } catch (error) {
+        // If parsing fails, return null since we expect a dictionary
+        return null;
       }
+    }
   }
   return null;
 }
 
+
+// function setCookie(name, value, daysToExpire) {
+//   var expirationDate = new Date();
+//   expirationDate.setDate(expirationDate.getDate() + daysToExpire);
+//   var cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value)) + "; expires=" + expirationDate.toUTCString() + "; path=/";
+//   document.cookie = cookieValue;
+// }
+
+// function getCookie(name) {
+//   var nameEQ = encodeURIComponent(name) + "=";
+//   var ca = document.cookie.split(';');
+//   for(var i = 0; i < ca.length; i++) {
+//     var c = ca[i];
+//     while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+//     if (c.indexOf(nameEQ) === 0) {
+//       return JSON.parse(decodeURIComponent(c.substring(nameEQ.length, c.length)));
+//     }
+//   }
+//   return null;
+// }
 
 
 
@@ -461,16 +491,12 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   const videosContainer = document.getElementById('videos-container');
   const audioContainer = document.createElement('div');
   audioContainer.classList.add('audio-container');
-
   const audioPlayer = document.createElement('audio');
   audioPlayer.src = url;
   audioPlayer.controls = false; // Disable default controls
-
   const playPauseBtn = document.createElement('button');
   playPauseBtn.classList.add('audio-play-pause');
-
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  
 
   function handlePlay(){
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
@@ -570,7 +596,6 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
     }
   });
 
-
   const currentTimeLabel = document.createElement('span');
 
   const durationLabel = document.createElement('span');
@@ -669,15 +694,13 @@ timelineSlider.addEventListener('input', () => {
       var fileDic = getCookie("fileDic");
       if (fileDic !== null) {
         if (url in fileDic) {
-        delete fileDic[url]
+          delete fileDic[url]
 
-        if (Object.keys(fileDic).length == 0){
-          // setCookie("fileDic", {}, 10);
-          deleteCookie("fileDic");
-        }else{
-          setCookie("fileDic", fileDic, 10);
-        }
-        
+          if (Object.keys(fileDic).length == 0){
+            deleteCookie("fileDic");
+          }else{
+            setCookie("fileDic", fileDic, 10);
+          }
         }
       }
   } catch (error) {
@@ -706,18 +729,17 @@ timelineSlider.addEventListener('input', () => {
   try {
     var fileDic = getCookie("fileDic");
     if (fileDic !== null) {
-      if (!url in fileDic) {  
+      if (!(url in fileDic)) {  
       var urlProperties = {}
       urlProperties["name"] = name
       urlProperties["timeFrame"] = timeFrame
       urlProperties["volume"] = volume
       fileDic[url] = urlProperties
       setCookie("fileDic", fileDic, 10);
-      alert("cookie has been set");
       }
     } else{
-      let fileDic = {};
-      var urlProperties = {}
+      var fileDic = {};
+      var urlProperties = {};
       urlProperties["name"] = name
       urlProperties["timeFrame"] = timeFrame
       urlProperties["volume"] = volume
@@ -730,18 +752,18 @@ timelineSlider.addEventListener('input', () => {
     alert("An error occurred: " + error);
 }
   // fileDic = getCookie("fileDic");
-  // alert(fileDic[url]["name"]);
+  // alert(fileDic[url]["name"]);o
 
 
 }
 
 
-async function filterLink(videoUrl) {
+async function filterLink(videoUrl, volume, timeFrame) {
   return new Promise((resolve, reject) => {
     if (videoUrl.includes("&list=")) {
       getPlaylistVideos(videoUrl)
       .then(urls => {
-        addVideoPlayer(videoUrl, volume, speed, true, urls); // No need to pass isPlaylist=true
+        addVideoPlayer(videoUrl, volume, speed, true, urls, timeFrame); // No need to pass isPlaylist=true
         resolve(); // Resolve the promise when processing is finished
       })
       .catch(error => {
@@ -750,7 +772,7 @@ async function filterLink(videoUrl) {
         reject(error); // Reject the promise if an error occurs
       });
     }else {
-      addVideoPlayer(videoUrl, volume, speed);
+      addVideoPlayer(videoUrl, volume, speed,false, [], timeFrame);
       resolve(); // Resolve the promise when processing is finished
     }
   });
@@ -776,15 +798,20 @@ fileInput.addEventListener('change', function(event) {
 
 
 async function initFunc() {
-  var URLs = getCookie("URLs");
-  if (URLs != null) {
-    for (const URL of URLs) {
+  var urlDic = getCookie("urlDic");
+
+  if (urlDic !== null) {
+    for (let url in urlDic) {
       try {
-        await filterLink(URL); // Await the completion of filterLink before moving to the next iteration
+        // alert(url);
+        // alert(typeof url);
+        // alert(urlDic[url]["volume"]);
+        // alert(urlDic[url]["timeFrame"])
+        await filterLink(url, urlDic[url]["volume"], urlDic[url]["timeFrame"]); // Await the completion of filterLink before moving to the next iteration  
         setTimeout(() => {
         }, 1000);
       } catch (error) {
-        console.error('Error processing URL:', error);
+        console.log(error);
       }
     }
   };
@@ -796,6 +823,5 @@ async function initFunc() {
     }
   }
 }
-
 
 initFunc()
