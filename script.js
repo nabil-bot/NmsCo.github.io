@@ -364,7 +364,52 @@ function setCookie(name, value, daysToExpire) {
   document.cookie = cookieValue;
 }
 
+// function setCookie(name, value, daysToExpire) {
+//   var expirationDate = new Date();
+//   expirationDate.setDate(expirationDate.getDate() + daysToExpire);
+//   var cookieValue;
+  
+//   // Check if the value is an object (dictionary)
+//   if (typeof value === 'object' && !Array.isArray(value)) {
+//     cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value)) + "; expires=" + expirationDate.toUTCString() + "; path=/";
+//   } else {
+//     // If the value is not an object or is an array, save it as is
+//     cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(value) + "; expires=" + expirationDate.toUTCString() + "; path=/";
+//   }
+  
+//   document.cookie = cookieValue;
+// }
+
+
+
 // Function to get a cookie by name
+// function getCookie(name) {
+//   var cookieName = encodeURIComponent(name) + "=";
+//   var cookieArray = document.cookie.split(';');
+//   for (var i = 0; i < cookieArray.length; i++) {
+//       var cookie = cookieArray[i].trim();
+//       if (cookie.indexOf(cookieName) === 0) {
+//           var cookieValue = cookie.substring(cookieName.length, cookie.length);
+//           try {
+//               // Try parsing the cookie value as JSON
+//               var parsedValue = JSON.parse(decodeURIComponent(cookieValue));
+//               // Check if the parsed value is an array
+//               if (Array.isArray(parsedValue)) {
+//                   return parsedValue; // Return the parsed array
+//               } else {
+//                   return [parsedValue]; // Return a new array with the parsed value as its only element
+//               }
+//           } catch (error) {
+//               // If parsing fails, return the cookie value as is
+//               return decodeURIComponent(cookieValue);
+//           }
+//       }
+//   }
+//   return null;
+// }
+
+
+
 function getCookie(name) {
   var cookieName = encodeURIComponent(name) + "=";
   var cookieArray = document.cookie.split(';');
@@ -375,11 +420,13 @@ function getCookie(name) {
           try {
               // Try parsing the cookie value as JSON
               var parsedValue = JSON.parse(decodeURIComponent(cookieValue));
-              // Check if the parsed value is an array
-              if (Array.isArray(parsedValue)) {
+              // Check if the parsed value is an object (and not an array)
+              if (typeof parsedValue === 'object' && !Array.isArray(parsedValue)) {
+                  return parsedValue; // Return the parsed object
+              } else if (Array.isArray(parsedValue)) {
                   return parsedValue; // Return the parsed array
               } else {
-                  return [parsedValue]; // Return a new array with the parsed value as its only element
+                  return parsedValue; // Return the parsed value if it's a primitive type
               }
           } catch (error) {
               // If parsing fails, return the cookie value as is
@@ -389,6 +436,7 @@ function getCookie(name) {
   }
   return null;
 }
+
 
 
 
@@ -410,7 +458,9 @@ document.getElementById("global-play-pause").addEventListener("click", function(
 
 const fileInput = document.getElementById('file-input');
 
-function addAudioPlayer(url, name) {
+async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
+
+
   const videosContainer = document.getElementById('videos-container');
   const audioContainer = document.createElement('div');
   audioContainer.classList.add('audio-container');
@@ -423,18 +473,29 @@ function addAudioPlayer(url, name) {
   playPauseBtn.classList.add('audio-play-pause');
 
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  let isPlaying = false;
-  playPauseBtn.addEventListener('click', () => {
-    if (isPlaying) {
-      audioPlayer.pause();
+  
 
-      playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  function handlePlay(){
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  }
+  function handlePause(){
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  }
+  function playPauseAudioPlayer(){
+    if (!audioPlayer.paused){
+      audioPlayer.pause();
     } else {
       audioPlayer.play();
-      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     }
-    isPlaying = !isPlaying;
-  });
+  }
+  
+  playPauseBtn.addEventListener('click', function(){
+    playPauseAudioPlayer()
+  }
+
+  );
+
+  audioPlayer.currentTime = timeFrame
 
   const sliderContainer = document.createElement('div');
   sliderContainer.classList.add('slider-container');
@@ -495,18 +556,34 @@ function addAudioPlayer(url, name) {
   volumeSlider.type = 'range';
   volumeSlider.min = 0;
   volumeSlider.max = 1;
-  volumeSlider.value = 0.8;
   volumeSlider.step = 0.01;
+  volumeSlider.value = volume;
   volumeSlider.classList.add('slider');
   volumeContainer.appendChild(volumeSlider);
+
+  audioPlayer.volume = volume
+
   volumeSlider.addEventListener('input', () => {
     audioPlayer.volume = volumeSlider.value;
+    var fileDic = getCookie("fileDic");
+    if (fileDic !== null) {
+      if (url in fileDic){
+
+
+        let floatValue = parseFloat(volumeSlider.value); // Convert the value to a float
+        let formattedValue = floatValue.toFixed(1); 
+
+        fileDic[url]["volume"] = formattedValue;
+        setCookie("fileDic", fileDic, 10);
+      } 
+    }
   });
+
 
   const currentTimeLabel = document.createElement('span');
 
   const durationLabel = document.createElement('span');
-  durationLabel.textContent = '/ 0:0'; // Initialize duration label
+  durationLabel.textContent = '0:0'; // Initialize duration label
 
   
   // Helper function to format time in MM:SS format
@@ -521,14 +598,25 @@ function addAudioPlayer(url, name) {
 
     return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
 };
-
   // Update current time label, timeline slider, and duration label
   audioPlayer.addEventListener('timeupdate', () => {
     currentTimeLabel.textContent = formatTime(audioPlayer.currentTime);
     timelineSlider.value = audioPlayer.currentTime; // Update slider value with current time
     timelineSlider.max = audioPlayer.duration; // Update slider max value with audio duration
-    durationLabel.textContent = `/ ${formatTime(audioPlayer.duration)}`;
-  });
+    durationLabel.textContent = `${formatTime(audioPlayer.duration)}`;
+
+    var fileDic = getCookie("fileDic");
+    if (fileDic !== null) {
+      if (url in fileDic){
+        fileDic[url]["timeFrame"] = audioPlayer.currentTime;
+        setCookie("fileDic", fileDic, 10);
+      } 
+    }
+  }
+);
+  audioPlayer.addEventListener('play', handlePlay);
+  audioPlayer.addEventListener('pause', handlePause);
+
   const volumeControlerContainer = document.createElement('div');
   volumeControlerContainer.classList.add('volumeControlerContainer');
   
@@ -575,29 +663,33 @@ function addAudioPlayer(url, name) {
   audioFileLabel.classList.add('AudioFileName');
 
 
-    const removeButton = document.createElement('button');
+  const removeButton = document.createElement('button');
   removeButton.textContent = '❌';
   removeButton.classList.add('remove-btn');
   removeButton.addEventListener('click', function () {
     audioContainer.remove();
     fileInput.value = '';
 
+    try {
+      var fileDic = getCookie("fileDic");
+      if (fileDic !== null) {
+        if (url in fileDic) {
+        delete fileDic[url]
 
-    //   try {
-    //     var URLs = getCookie("URLs");
-    //     if (URLs !== null) {
-    //       if (URLs.includes()) {
-    //         const indexOfVideoUrl = URLs.indexOf();  // Store index for clarity
-    //         URLs.splice(indexOfVideoUrl, 1); // Remove the element at the found index
-    //         setCookie("URLs", URLs, 10); // Assuming setCookie takes value, expiry, path
-    //       } else {
-    //         alert(videoUrl + " is not found in URLs");
-    //       }
-    //     }
-    // } catch (error) {
-    //     // This block will be executed when an error occurs
-    //     alert("An error occurred: " + error);
-    // }
+        if (Object.keys(fileDic).length == 0){
+          // setCookie("fileDic", {}, 10);
+          deleteCookie("fileDic");
+        }else{
+          setCookie("fileDic", fileDic, 10);
+        }
+        
+        }
+      }
+  } catch (error) {
+      alert("An error occurred: " + error);
+  }
+
+
   });
   // videoControlsWrapper.appendChild(volumeContainer)
   // videoControlsWrapper.appendChild(removeButton);
@@ -616,21 +708,35 @@ function addAudioPlayer(url, name) {
   videosContainer.appendChild(audioContainer);
 
 
-//   try {
-//     var URLs = getCookie("URLs");
+  try {
+    var fileDic = getCookie("fileDic");
+    if (fileDic !== null) {
+      if (!url in fileDic) {  
+      var urlProperties = {}
+      urlProperties["name"] = name
+      urlProperties["timeFrame"] = timeFrame
+      urlProperties["volume"] = volume
+      fileDic[url] = urlProperties
+      setCookie("fileDic", fileDic, 10);
+      alert("cookie has been set");
+      }
+    } else{
+      let fileDic = {};
+      var urlProperties = {}
+      urlProperties["name"] = name
+      urlProperties["timeFrame"] = timeFrame
+      urlProperties["volume"] = volume
+      fileDic[url] = urlProperties
+      setCookie("fileDic", fileDic, 10);
+    }
 
-//     if (URLs != null){
-//       if (!URLs.includes(url)){
-//         URLs.push(url)
-//         setCookie("URLs", URLs, 10);
-//       }
-//     } else{
-//       setCookie("URLs", [url], 10);
-//     }
-// } catch (error) {
-//     // This block will be executed when an error occurs
-//     alert("An error occurred: " + error);
-// }
+} catch (error) {
+    // This block will be executed when an error occurs
+    alert("An error occurred: " + error);
+}
+  // fileDic = getCookie("fileDic");
+  // alert(fileDic[url]["name"]);
+
 
 }
 
@@ -648,8 +754,6 @@ async function filterLink(videoUrl) {
         alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
         reject(error); // Reject the promise if an error occurs
       });
-    }else if (videoUrl.includes("blob:")){
-      addAudioPlayer(videoUrl, "")
     }else {
       addVideoPlayer(videoUrl, volume, speed);
       resolve(); // Resolve the promise when processing is finished
@@ -658,29 +762,22 @@ async function filterLink(videoUrl) {
 }
 
 
-
-
-
+function deleteCookie(name) {
+  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
 
 
 fileInput.addEventListener('change', function(event) {
   const file = event.target.files[0];
+
   if (file) {
-      const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(file);
+    const name = file.name
       if (file.type.startsWith('audio/')) {
-          addAudioPlayer(url, file.name);
+          addAudioPlayer(url, name);
       }
   }
 });
-
-
-// const volumeSlider = document.getElementById('volumeSlider');
-// audioPlayer.volume = volumeSlider.value;
-// volumeSlider.addEventListener('input', (event) => {
-//     audioPlayer.volume = event.target.value;
-// });
-
-
 
 
 async function initFunc() {
@@ -694,6 +791,13 @@ async function initFunc() {
       } catch (error) {
         console.error('Error processing URL:', error);
       }
+    }
+  };
+
+  var fileDic = getCookie("fileDic");
+  if (fileDic != null) {
+    for (let url in fileDic){
+      addAudioPlayer(url, fileDic[url]["name"], fileDic[url]["timeFrame"], fileDic[url]["volume"]);
     }
   }
 }

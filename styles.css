@@ -21,6 +21,8 @@ h1 {
   flex-wrap: wrap;
   justify-content: center;
   margin-top: 16px;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 
 .audio-container{
@@ -48,9 +50,6 @@ h1 {
 }
 
 
-.timeline-slider{
-  width: 65%;
-}
 
 .video-wrapper {
   margin: 5px;
@@ -419,8 +418,8 @@ audio::-webkit-media-controls-time-remaining-display {
 }
 
 .audio-play-pause{
-  padding: 8px 16px;
-
+  padding: 8px 12px;
+  /* height: 26px; */
 }
 
 
@@ -451,7 +450,7 @@ audio::-webkit-media-controls-time-remaining-display {
 
 .slider-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   /* width: 90%; */
   padding: 10px;
   background-color: #f0f0f0; /* Optional: Adds a background color */
@@ -460,16 +459,36 @@ audio::-webkit-media-controls-time-remaining-display {
   margin-bottom: 5px;
 }
 
-.timeline-slider {
-  width: 90%;
-  margin-bottom: 10px; /* Adds space between the slider and the labels */
 
+
+
+
+
+
+
+
+
+
+
+.timeline-slider {
+  width: 100%;
+  margin-bottom: 8px; /* Adds space between the slider and the labels */
+  background-color: white;
 }
+
+
+
+
+
+
+
 
 .timelabelContainer {
   display: flex;
   flex-direction: row;
   /* height: 15px; */
+  justify-content: space-between;
+
 }
 
 .time-label {
