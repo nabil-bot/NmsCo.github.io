@@ -484,7 +484,6 @@ document.getElementById("global-play-pause").addEventListener("click", function(
   }
 });
 
-
 const fileInput = document.getElementById('file-input');
 
 async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
