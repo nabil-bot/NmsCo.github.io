@@ -264,13 +264,11 @@ function initializeYouTubeAPI(iframe, volume, timeFrame) {
         var urlDic = getCookie("urlDic");
         if (urlDic != null){
           if (!(videoUrl in urlDic)){
-            alert("not in the dic")
             var urlProperties = {}
             urlProperties["timeFrame"] = timeFrame
             urlProperties["volume"] = volume
             urlDic[videoUrl] = urlProperties
             setCookie("urlDic", urlDic, 10);
-            alert(Object.keys(urlDic).length)
           }
         } else{
           var urlDic = {};
@@ -483,6 +481,7 @@ document.getElementById("global-play-pause").addEventListener("click", function(
     icon.classList.add("fa-play");
   }
 });
+
 
 const fileInput = document.getElementById('file-input');
 
