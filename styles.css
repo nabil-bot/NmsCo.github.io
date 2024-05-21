@@ -213,12 +213,8 @@ body {
 
 /* Styling for small screens (mobile) */
 @media screen and (max-width: 600px) {
-
-
-
-
   header h1 {
-    font-size: 20px;
+    font-size: 18px;
   }
 }
 

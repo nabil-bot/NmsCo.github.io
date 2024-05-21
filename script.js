@@ -82,6 +82,79 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
   videoControlsWrapper.appendChild(videoSpeedWrapper);
     
 
+  
+  function initializeYouTubeAPI(iframe, volume, timeFrame) {
+    function createPlayer() {
+      const player = new YT.Player(iframe, {
+        events: {
+          'onReady': function (event) {
+            try {
+              event.target.setVolume(volume);
+              event.target.seekTo(timeFrame);
+              if (players.indexOf(event.target) === -1) {
+                players.push(event.target);
+              } else {
+                console.log('Player already exists in players array');
+              }
+            } catch (error) {
+              console.error('Error during onReady event:', error);
+            }
+          },
+          'onStateChange': function (event) {
+            try {
+              if (event.data === YT.PlayerState.ENDED) {
+                playNextVideoFromPlaylist(videoWrapper);
+                // console.log('Video ended, playing next video from playlist');
+              } else if (event.data === YT.PlayerState.PAUSED){
+
+                  var urlDic = getCookie("urlDic");
+                  if (urlDic != null){
+                    if (videoUrl in urlDic)
+
+                      var floatNumber = player.getCurrentTime();
+                      var intNumber = Math.floor(floatNumber);   
+                      urlDic[videoUrl]["timeFrame"]=  intNumber;
+                      setCookie("urlDic", urlDic, 10);
+                      console.log(urlDic[videoUrl]["timeFrame"])
+                  }
+
+
+              }
+            } catch (error) {
+              console.error('Error during onStateChange event:', error);
+            }
+          }
+        },
+        'onPlaybackQualityChange': function (event) {
+          // This function will be called when playback quality changes
+          // alert(player.getPlaybackQuality());
+          console.log(event.target.getPlaybackQuality());
+        }
+        ,
+        playerVars: {
+          // Add additional parameters if needed
+        }
+      });
+
+      // Optional: Check if the player instance is created successfully
+      if (!player) {
+        console.error('Failed to create YouTube player instance');
+      } else {
+        console.log('YouTube player instance created successfully');
+      }
+    }
+
+    function waitForYouTubeAPI() {
+      if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+        // console.log('YouTube IFrame API is not yet loaded. Waiting...');
+        setTimeout(waitForYouTubeAPI, 100); // Retry after 100 milliseconds
+      } else {
+        createPlayer();
+      }
+    }
+    waitForYouTubeAPI();
+  } // initializeYouTubeAPI function ends here
+
   if (isPlaylist) {
     const previousButton = document.createElement('button');
     previousButton.textContent = '⏮';
@@ -162,79 +235,9 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
     iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
     const slider = videoWrapper.querySelector('.slider');
     initializeYouTubeAPI(iframe, slider.value);
+    // if (players.indexOf(event.target) === -1) 
   }
 
-function initializeYouTubeAPI(iframe, volume, timeFrame) {
-  function createPlayer() {
-    const player = new YT.Player(iframe, {
-      events: {
-        'onReady': function (event) {
-          try {
-            event.target.setVolume(volume);
-            event.target.seekTo(timeFrame);
-            if (players.indexOf(event.target) === -1) {
-              players.push(event.target);
-            } else {
-              console.log('Player already exists in players array');
-            }
-          } catch (error) {
-            console.error('Error during onReady event:', error);
-          }
-        },
-        'onStateChange': function (event) {
-          try {
-            if (event.data === YT.PlayerState.ENDED) {
-              playNextVideoFromPlaylist(videoWrapper);
-              // console.log('Video ended, playing next video from playlist');
-            } else if (event.data === YT.PlayerState.PAUSED){
-
-                var urlDic = getCookie("urlDic");
-                if (urlDic != null){
-                  if (videoUrl in urlDic)
-
-                    var floatNumber = player.getCurrentTime();
-                    var intNumber = Math.floor(floatNumber);   
-                    urlDic[videoUrl]["timeFrame"]=  intNumber;
-                    setCookie("urlDic", urlDic, 10);
-                    console.log(urlDic[videoUrl]["timeFrame"])
-                }
-
-
-            }
-          } catch (error) {
-            console.error('Error during onStateChange event:', error);
-          }
-        }
-      },
-      'onPlaybackQualityChange': function (event) {
-        // This function will be called when playback quality changes
-        // alert(player.getPlaybackQuality());
-        console.log(event.target.getPlaybackQuality());
-      }
-      ,
-      playerVars: {
-        // Add additional parameters if needed
-      }
-    });
-
-    // Optional: Check if the player instance is created successfully
-    if (!player) {
-      console.error('Failed to create YouTube player instance');
-    } else {
-      console.log('YouTube player instance created successfully');
-    }
-  }
-
-  function waitForYouTubeAPI() {
-    if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
-      // console.log('YouTube IFrame API is not yet loaded. Waiting...');
-      setTimeout(waitForYouTubeAPI, 100); // Retry after 100 milliseconds
-    } else {
-      createPlayer();
-    }
-  }
-  waitForYouTubeAPI();
-} // initializeYouTubeAPI function ends here
   initializeYouTubeAPI(iframe, volume, timeFrame);
   
   
@@ -403,13 +406,6 @@ document.getElementById("global-play-pause").addEventListener("click", function(
     icon.classList.add("fa-play");
   }
 });
-
-// document.getElementById('resolutionSelect').addEventListener('change', function() {
-//   var selectedResolution = this.value;
-//   players.forEach(player => {
-//     player.setPlaybackQuality(selectedResolution);
-//   });
-// });
 
 
 
