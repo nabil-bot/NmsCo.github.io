@@ -2,32 +2,6 @@ let videoCount = 0;
 let players = [];
 const volume = 50;
 const speed = 1;
-// let currentPlaylistIndex = 0;
-// let playlistVideos = [];
-
-
-function setUrlDicProperty(videoUrl, key, value){
-  try {
-    var urlDic = getCookie("urlDic");
-    if (urlDic != null){
-      if (videoUrl in urlDic){
-        urlDic[videoUrl][key] = value
-        setCookie("urlDic", urlDic, 10);
-      }
-    } else{
-      var urlDic = {};
-      var urlProperties = {};
-      urlProperties["volume"] = 60
-      urlProperties["timeFrame"] = 0
-      urlDic[videoUrl] = urlProperties
-      setCookie("urlDic", urlDic, 10);
-      urlDic = getCookie("urlDic");
-    }
-
-} catch (error) {
-    alert("An error occurred: " + error);
-}
-} 
 
 
 async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[], timeFrame=0) { //videoUrl could be playlist url
@@ -226,7 +200,6 @@ function initializeYouTubeAPI(iframe, volume, timeFrame) {
                     console.log(urlDic[videoUrl]["timeFrame"])
                 }
 
-              // setUrlDicProperty(videoUrl, "timeFrame", intNumber)
 
             }
           } catch (error) {
@@ -410,15 +383,7 @@ document.addEventListener('visibilitychange', function () {
 } 
 });
 
-// Check if cookies are enabled
-function areCookiesEnabled() {
-  var cookieEnabled = navigator.cookieEnabled;
-  if (!cookieEnabled) {
-      document.cookie = "testcookie";
-      cookieEnabled = document.cookie.indexOf("testcookie") !== -1;
-  }
-  return cookieEnabled;
-}
+
 function setCookie(name, value, daysToExpire) {
   var expirationDate = new Date();
   expirationDate.setDate(expirationDate.getDate() + daysToExpire);
@@ -444,29 +409,6 @@ function getCookie(name) {
   return null;
 }
 
-
-// function setCookie(name, value, daysToExpire) {
-//   var expirationDate = new Date();
-//   expirationDate.setDate(expirationDate.getDate() + daysToExpire);
-//   var cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value)) + "; expires=" + expirationDate.toUTCString() + "; path=/";
-//   document.cookie = cookieValue;
-// }
-
-// function getCookie(name) {
-//   var nameEQ = encodeURIComponent(name) + "=";
-//   var ca = document.cookie.split(';');
-//   for(var i = 0; i < ca.length; i++) {
-//     var c = ca[i];
-//     while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-//     if (c.indexOf(nameEQ) === 0) {
-//       return JSON.parse(decodeURIComponent(c.substring(nameEQ.length, c.length)));
-//     }
-//   }
-//   return null;
-// }
-
-
-
 document.getElementById("global-play-pause").addEventListener("click", function() {
   var icon = document.getElementById("play-pause-icon");
   if (icon.classList.contains("fa-play")) {
@@ -485,13 +427,16 @@ document.getElementById("global-play-pause").addEventListener("click", function(
 
 const fileInput = document.getElementById('file-input');
 
+
 async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
+  return new Promise((resolve, reject) => {
+
   const videosContainer = document.getElementById('videos-container');
   const audioContainer = document.createElement('div');
   audioContainer.classList.add('audio-container');
   const audioPlayer = document.createElement('audio');
   audioPlayer.src = url;
-  audioPlayer.controls = false; // Disable default controls
+  // audioPlayer.controls = false; // Disable default controls
   const playPauseBtn = document.createElement('button');
   playPauseBtn.classList.add('audio-play-pause');
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
@@ -516,7 +461,7 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
 
   );
 
-  audioPlayer.currentTime = timeFrame
+  // audioPlayer.currentTime = timeFrame
 
   const sliderContainer = document.createElement('div');
   sliderContainer.classList.add('slider-container');
@@ -528,7 +473,6 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   timelineSlider.value = '0';
   timelineSlider.step = '1';
 
-  
 
   const forwardButton = document.createElement('button');
   forwardButton.textContent = '+10s';
@@ -580,7 +524,7 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   volumeSlider.classList.add('slider');
   volumeContainer.appendChild(volumeSlider);
 
-  audioPlayer.volume = volume
+  // audioPlayer.volume = volume
   volumeSlider.addEventListener('input', () => {
     audioPlayer.volume = volumeSlider.value;
     var fileDic = getCookie("fileDic");
@@ -618,7 +562,6 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
     timelineSlider.value = audioPlayer.currentTime; // Update slider value with current time
     timelineSlider.max = audioPlayer.duration; // Update slider max value with audio duration
     durationLabel.textContent = `${formatTime(audioPlayer.duration)}`;
-
     var fileDic = getCookie("fileDic");
     if (fileDic !== null) {
       if (url in fileDic){
@@ -628,10 +571,23 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
     }
   }
 );
-timelineSlider.addEventListener('input', () => {
-  audioPlayer.currentTime = timelineSlider.value;
-  console.log(timelineSlider.value)
+
+
+  audioPlayer.addEventListener('loadedmetadata', () => {
+    // Ensure fileDic and its properties exist before accessing them
+  var fileDic = getCookie("fileDic");
+  if (fileDic !== null && fileDic[url] !== undefined) {
+      audioPlayer.currentTime = fileDic[url]["timeFrame"];
+      audioPlayer.volume = fileDic[url]["volume"];
+    }
+  });
+
+  audioPlayer.addEventListener('error', (e) => {
+    console.error('Failed to load audio:', e.message);
 });
+  timelineSlider.addEventListener('input', () => {
+    audioPlayer.currentTime = timelineSlider.value;
+  });
   audioPlayer.addEventListener('play', handlePlay);
   audioPlayer.addEventListener('pause', handlePause);
 
@@ -745,15 +701,18 @@ timelineSlider.addEventListener('input', () => {
       setCookie("fileDic", fileDic, 10);
     }
 
-} catch (error) {
+  } catch (error) {
     // This block will be executed when an error occurs
     alert("An error occurred: " + error);
-}
+  }
+  resolve();
   // fileDic = getCookie("fileDic");
   // alert(fileDic[url]["name"]);o
 
-
+})
 }
+
+
 
 
 async function filterLink(videoUrl, volume, timeFrame) {
@@ -796,30 +755,39 @@ fileInput.addEventListener('change', function(event) {
 
 
 async function initFunc() {
+  try{
   var urlDic = getCookie("urlDic");
+    if (urlDic !== null) {
+      for (let url in urlDic) {
+        try {
+          // alert(url);
+          // alert(typeof url);
+          // alert(urlDic[url]["volume"]);
+          // alert(urlDic[url]["timeFrame"])
+          await filterLink(url, urlDic[url]["volume"], urlDic[url]["timeFrame"]); // Await the completion of filterLink before moving to the next iteration  
 
-  if (urlDic !== null) {
-    for (let url in urlDic) {
-      try {
-        // alert(url);
-        // alert(typeof url);
-        // alert(urlDic[url]["volume"]);
-        // alert(urlDic[url]["timeFrame"])
-        await filterLink(url, urlDic[url]["volume"], urlDic[url]["timeFrame"]); // Await the completion of filterLink before moving to the next iteration  
-        setTimeout(() => {
-        }, 1000);
-      } catch (error) {
-        console.log(error);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    var fileDic = getCookie("fileDic");
+    if (fileDic != null) {
+      for (let url in fileDic){
+        await addAudioPlayer(url, fileDic[url]["name"], fileDic[url]["timeFrame"], fileDic[url]["volume"]);
+
       }
     }
-  };
-
-  var fileDic = getCookie("fileDic");
-  if (fileDic != null) {
-    for (let url in fileDic){
-      addAudioPlayer(url, fileDic[url]["name"], fileDic[url]["timeFrame"], fileDic[url]["volume"]);
-    }
+  }catch (error) {
+    console.error('An error occurred during initialization:', error);
   }
+
+
+
 }
 
-initFunc()
+initFunc().then(() => {
+  console.log('Initialization completed.');
+}).catch(error => {
+  console.error('Initialization failed:', error);
+});
