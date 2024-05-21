@@ -20,9 +20,9 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 16px;
-  margin-left: 5%;
-  margin-right: 5%;
+  margin-top: 14px;
+  margin-left: 8%;
+  margin-right: 8%;
 }
 
 .audio-container{

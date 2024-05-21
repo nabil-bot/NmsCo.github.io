@@ -3,7 +3,6 @@ let players = [];
 const volume = 50;
 const speed = 1;
 
-
 async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[], timeFrame=0) { //videoUrl could be playlist url
   if (isPlaylist){
     videoId = getVideoId(playlistVideos[0]);
@@ -207,6 +206,12 @@ function initializeYouTubeAPI(iframe, volume, timeFrame) {
           }
         }
       },
+      'onPlaybackQualityChange': function (event) {
+        // This function will be called when playback quality changes
+        // alert(player.getPlaybackQuality());
+        console.log(event.target.getPlaybackQuality());
+      }
+      ,
       playerVars: {
         // Add additional parameters if needed
       }
@@ -257,17 +262,13 @@ function initializeYouTubeAPI(iframe, volume, timeFrame) {
     } catch (error) {
         alert("An error occurred: " + error);
     }
-} // finissing of the addVideoPlayer function
-
-
+}
 async function addVideo() {
   const videoUrlInput = document.getElementById('video-url');
   let videoUrl = videoUrlInput.value.trim();
   await filterLink(videoUrl, 60,0)
   videoUrlInput.value = '';
 }
-
-// addvideo ends here
 function getPlaylistVideos(playlistUrl) {
   return new Promise((resolve, reject) => {
     const playlistId = new URL(playlistUrl).searchParams.get('list');
@@ -283,8 +284,6 @@ function getPlaylistVideos(playlistUrl) {
       });
   });
 }
-
-
 async function fetchVideosFromPlaylist(playlistId) {
   const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=AIzaSyDQkRgxuQ7i5-1UuYtuve8eZgAb1-XGe30`);
   const data = await response.json();
@@ -303,33 +302,24 @@ function removeVideo(videoWrapper, videoUrl) {
   const videoId = iframe.src.split('/').pop().split('?')[0];
   players = players.filter(player => player.getVideoData().video_id !== videoId);
   videoWrapper.remove();
-  try {
-      var URLs = getCookie("URLs");
-      if (URLs !== null) {
-        if (URLs.includes(videoUrl)) {
-          const indexOfVideoUrl = URLs.indexOf(videoUrl);  // Store index for clarity
-          URLs.splice(indexOfVideoUrl, 1); // Remove the element at the found index
-          setCookie("URLs", URLs, 10); // Assuming setCookie takes value, expiry, path
-        } else {
-          alert(videoUrl + " is not found in URLs");
-        }
-      }
-  } catch (error) {
-      // This block will be executed when an error occurs
-      alert("An error occurred: " + error);
-  }
-}
-
-function getVideoId(url) {
-  const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
   
-  const match = url.match(regExp);
+}
+function getVideoId(url) {
+  var regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
+  
+  var match = url.match(regExp);
 
   if (match && match[1]) {
     return match[1];
   } else {
-    alert('Invalid YouTube URL.');
-    return null;
+    regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
+    match = url.match(regExp);
+    if (match && match[1]) {
+      return match[1];
+    } else {
+      alert("Invalid url")
+      return null;
+    }
   }
 }
 function setVolume(videoWrapper, volume) {
@@ -357,12 +347,8 @@ function pasteFromClipboard() {
       console.error('Failed to read clipboard contents: ', err);
     });
 }
-
 document.getElementById('add-video-btn').addEventListener('click', addVideo);
 document.getElementById('paste-btn').addEventListener('click', pasteFromClipboard);
-
-
-// Pause/Play video when visibility of the page changes
 document.addEventListener('visibilitychange', function () {
   var checkbox = document.getElementById('myCheckbox');
   if (checkbox.checked) {
@@ -382,15 +368,12 @@ document.addEventListener('visibilitychange', function () {
   }
 } 
 });
-
-
 function setCookie(name, value, daysToExpire) {
   var expirationDate = new Date();
   expirationDate.setDate(expirationDate.getDate() + daysToExpire);
   var cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value)) + "; expires=" + expirationDate.toUTCString() + "; path=/";
   document.cookie = cookieValue;
 }
-
 function getCookie(name) {
   var cookieName = encodeURIComponent(name) + "=";
   var cookieArray = document.cookie.split(';');
@@ -408,39 +391,40 @@ function getCookie(name) {
   }
   return null;
 }
-
 document.getElementById("global-play-pause").addEventListener("click", function() {
   var icon = document.getElementById("play-pause-icon");
   if (icon.classList.contains("fa-play")) {
-    // Play functionality
     players.forEach(player => {player.playVideo();});
     icon.classList.remove("fa-play");
     icon.classList.add("fa-pause");
   } else {
-    // Pause functionality
     players.forEach(player => {player.pauseVideo();});
     icon.classList.remove("fa-pause");
     icon.classList.add("fa-play");
   }
 });
 
+// document.getElementById('resolutionSelect').addEventListener('change', function() {
+//   var selectedResolution = this.value;
+//   players.forEach(player => {
+//     player.setPlaybackQuality(selectedResolution);
+//   });
+// });
+
+
 
 const fileInput = document.getElementById('file-input');
-
-
 async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   return new Promise((resolve, reject) => {
-
   const videosContainer = document.getElementById('videos-container');
   const audioContainer = document.createElement('div');
   audioContainer.classList.add('audio-container');
   const audioPlayer = document.createElement('audio');
   audioPlayer.src = url;
-  // audioPlayer.controls = false; // Disable default controls
+  audioPlayer.controls = false;
   const playPauseBtn = document.createElement('button');
   playPauseBtn.classList.add('audio-play-pause');
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-
   function handlePlay(){
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
   }
@@ -460,8 +444,6 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   }
 
   );
-
-  // audioPlayer.currentTime = timeFrame
 
   const sliderContainer = document.createElement('div');
   sliderContainer.classList.add('slider-container');
@@ -524,7 +506,6 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   volumeSlider.classList.add('slider');
   volumeContainer.appendChild(volumeSlider);
 
-  // audioPlayer.volume = volume
   volumeSlider.addEventListener('input', () => {
     audioPlayer.volume = volumeSlider.value;
     var fileDic = getCookie("fileDic");
@@ -556,11 +537,10 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
 
     return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
 };
-  // Update current time label, timeline slider, and duration label
   audioPlayer.addEventListener('timeupdate', () => {
     currentTimeLabel.textContent = formatTime(audioPlayer.currentTime);
-    timelineSlider.value = audioPlayer.currentTime; // Update slider value with current time
-    timelineSlider.max = audioPlayer.duration; // Update slider max value with audio duration
+    timelineSlider.value = audioPlayer.currentTime; 
+    timelineSlider.max = audioPlayer.duration;
     durationLabel.textContent = `${formatTime(audioPlayer.duration)}`;
     var fileDic = getCookie("fileDic");
     if (fileDic !== null) {
@@ -572,14 +552,17 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   }
 );
 
-
   audioPlayer.addEventListener('loadedmetadata', () => {
-    // Ensure fileDic and its properties exist before accessing them
+
   var fileDic = getCookie("fileDic");
   if (fileDic !== null && fileDic[url] !== undefined) {
       audioPlayer.currentTime = fileDic[url]["timeFrame"];
       audioPlayer.volume = fileDic[url]["volume"];
     }
+  });
+  audioPlayer.addEventListener('ended', () => {
+
+    alert("audio stoped")
   });
 
   audioPlayer.addEventListener('error', (e) => {
@@ -590,53 +573,30 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   });
   audioPlayer.addEventListener('play', handlePlay);
   audioPlayer.addEventListener('pause', handlePause);
-
   const volumeControlerContainer = document.createElement('div');
   volumeControlerContainer.classList.add('volumeControlerContainer');
-  
   const otherAudioControllersContainer = document.createElement('div');
   otherAudioControllersContainer.classList.add('otherAudioControllersContainer');
-  
-
-
   sliderContainer.appendChild(timelineSlider);
-
-
   audioContainer.appendChild(sliderContainer);
   const audioControls = document.createElement('div');
   audioControls.classList.add('audio-controls');
-  
   const timeLabelContainer = document.createElement('div');
   timeLabelContainer.classList.add('timelabelContainer');
-  
   timeLabelContainer.appendChild(currentTimeLabel);
   timeLabelContainer.appendChild(durationLabel);
-
   sliderContainer.appendChild(timeLabelContainer)
-  // audioContainer.appendChild(currentTimeLabel);
-  // audioContainer.appendChild(durationLabel);
-  
-  
   otherAudioControllersContainer.appendChild(playPauseBtn);
-  // otherAudioControllersContainer.appendChild(backward30Sec);
   otherAudioControllersContainer.appendChild(backwardButton);
   otherAudioControllersContainer.appendChild(forwardButton);
   otherAudioControllersContainer.appendChild(forward30Sec);
-  
-
   otherAudioControllersContainer.appendChild(speedSelect);
-
   volumeControlerContainer.appendChild(volumeContainer);
-  
   audioControls.appendChild(otherAudioControllersContainer);
   audioControls.appendChild(volumeControlerContainer);
-
-
   const audioFileLabel = document.createElement('label');
   audioFileLabel.textContent = name;
   audioFileLabel.classList.add('AudioFileName');
-
-
   const removeButton = document.createElement('button');
   removeButton.textContent = '❌';
   removeButton.classList.add('remove-btn');
@@ -660,12 +620,7 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   } catch (error) {
       alert("An error occurred: " + error);
   }
-
-
   });
-  // videoControlsWrapper.appendChild(volumeContainer)
-  // videoControlsWrapper.appendChild(removeButton);
-
   const removeContainer = document.createElement('div');
   removeContainer.classList.add('remove-container');
   removeContainer.appendChild(audioFileLabel)
@@ -674,9 +629,7 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
 
   audioContainer.appendChild(audioPlayer);
   audioContainer.appendChild(audioControls);
-  // audioContainer.appendChild(audioFileLabel);
   audioContainer.appendChild(removeContainer);
-  
   videosContainer.appendChild(audioContainer);
 
 
@@ -702,17 +655,11 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
     }
 
   } catch (error) {
-    // This block will be executed when an error occurs
     alert("An error occurred: " + error);
   }
   resolve();
-  // fileDic = getCookie("fileDic");
-  // alert(fileDic[url]["name"]);o
-
 })
 }
-
-
 
 
 async function filterLink(videoUrl, volume, timeFrame) {
@@ -721,26 +668,22 @@ async function filterLink(videoUrl, volume, timeFrame) {
       getPlaylistVideos(videoUrl)
       .then(urls => {
         addVideoPlayer(videoUrl, volume, speed, true, urls, timeFrame); // No need to pass isPlaylist=true
-        resolve(); // Resolve the promise when processing is finished
+        resolve();
       })
       .catch(error => {
         console.error('Error:', error);
         alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
-        reject(error); // Reject the promise if an error occurs
+        reject(error);
       });
     }else {
       addVideoPlayer(videoUrl, volume, speed,false, [], timeFrame);
-      resolve(); // Resolve the promise when processing is finished
+      resolve(); 
     }
   });
 }
-
-
 function deleteCookie(name) {
   document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }
-
-
 fileInput.addEventListener('change', function(event) {
   const file = event.target.files[0];
 
@@ -753,19 +696,13 @@ fileInput.addEventListener('change', function(event) {
   }
 });
 
-
 async function initFunc() {
   try{
   var urlDic = getCookie("urlDic");
     if (urlDic !== null) {
       for (let url in urlDic) {
         try {
-          // alert(url);
-          // alert(typeof url);
-          // alert(urlDic[url]["volume"]);
-          // alert(urlDic[url]["timeFrame"])
-          await filterLink(url, urlDic[url]["volume"], urlDic[url]["timeFrame"]); // Await the completion of filterLink before moving to the next iteration  
-
+          await filterLink(url, urlDic[url]["volume"], urlDic[url]["timeFrame"]); 
         } catch (error) {
           console.log(error);
         }
@@ -781,11 +718,7 @@ async function initFunc() {
   }catch (error) {
     console.error('An error occurred during initialization:', error);
   }
-
-
-
 }
-
 initFunc().then(() => {
   console.log('Initialization completed.');
 }).catch(error => {
