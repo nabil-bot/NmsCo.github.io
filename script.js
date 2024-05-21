@@ -25,8 +25,6 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
   iframe.allowFullscreen = true;
   videoWrapper.appendChild(iframe);
   
-  
-  
   const volumeContainer = document.createElement('div');
   volumeContainer.classList.add('volume-container');
   const speakerIcon = document.createElement('i');
@@ -49,9 +47,7 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
     }else if (volumeSlider.value == 0) {
       setVolume(videoWrapper, 50);
     }
-    
   });
-
   const videoControlsWrapper = document.createElement('div');
   videoControlsWrapper.classList.add('video-controls');
   const videoSpeedWrapper = document.createElement('div');
@@ -65,7 +61,10 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
   videoSpeedSelect.innerHTML = `
     <option value="0.25">0.25x</option>
     <option value="0.5">0.5x</option>
+    <option value="0.75">0.5x</option>
     <option value="1" selected>1x</option>
+    <option value="1.1" selected>1x</option>
+    <option value="1.15" selected>1x</option>
     <option value="1.25">1.25x</option>
     <option value="1.5">1.5x</option>
     <option value="2">2x</option>
@@ -459,8 +458,6 @@ document.getElementById("global-play-pause").addEventListener("click", function(
 const fileInput = document.getElementById('file-input');
 
 async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
-
-
   const videosContainer = document.getElementById('videos-container');
   const audioContainer = document.createElement('div');
   audioContainer.classList.add('audio-container');
@@ -507,9 +504,7 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   timelineSlider.value = '0';
   timelineSlider.step = '1';
 
-  timelineSlider.addEventListener('input', () => {
-    audioPlayer.currentTime = timelineSlider.value;
-  });
+  
 
   const forwardButton = document.createElement('button');
   forwardButton.textContent = '+10s';
@@ -562,17 +557,13 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
   volumeContainer.appendChild(volumeSlider);
 
   audioPlayer.volume = volume
-
   volumeSlider.addEventListener('input', () => {
     audioPlayer.volume = volumeSlider.value;
     var fileDic = getCookie("fileDic");
     if (fileDic !== null) {
       if (url in fileDic){
-
-
         let floatValue = parseFloat(volumeSlider.value); // Convert the value to a float
         let formattedValue = floatValue.toFixed(1); 
-
         fileDic[url]["volume"] = formattedValue;
         setCookie("fileDic", fileDic, 10);
       } 
@@ -614,6 +605,10 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
     }
   }
 );
+timelineSlider.addEventListener('input', () => {
+  audioPlayer.currentTime = timelineSlider.value;
+  console.log(timelineSlider.value)
+});
   audioPlayer.addEventListener('play', handlePlay);
   audioPlayer.addEventListener('pause', handlePause);
 
