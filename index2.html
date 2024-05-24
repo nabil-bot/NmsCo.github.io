@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persistent Audio Player with IndexedDB</title>
+</head>
+<body>
+    <h1>Persistent Audio Player</h1>
+    <input type="file" id="audioFile" accept="audio/*">
+    <audio id="audioPlayer" controls></audio>
+    <br>
+    <label for="volumeControl">Volume: </label>
+    <input type="range" id="volumeControl" min="0" max="1" step="0.01">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const audioFileInput = document.getElementById('audioFile');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const volumeControl = document.getElementById('volumeControl');
+
+            const dbName = 'audioPlayerDB';
+            const dbVersion = 1;
+            let db;
+
+            // Open IndexedDB
+            const request = indexedDB.open(dbName, dbVersion);
+            request.onerror = (event) => {
+                console.error('Database error:', event.target.errorCode);
+            };
+            request.onsuccess = (event) => {
+                db = event.target.result;
+                loadAudioSettings();
+            };
+            request.onupgradeneeded = (event) => {
+                db = event.target.result;
+                db.createObjectStore('audioSettings', { keyPath: 'id' });
+            };
+
+            const saveAudioSettings = () => {
+
+                const transaction = db.transaction(['audioSettings'], 'readwrite');
+                const store = transaction.objectStore('audioSettings');
+                store.put({
+                    id: 'settings',
+                    audioSrc: audioPlayer.src,
+                    currentTime: audioPlayer.currentTime,
+                    volume: audioPlayer.volume
+                });
+            };
+
+            const loadAudioSettings = () => {
+                const transaction = db.transaction(['audioSettings'], 'readonly');
+                const store = transaction.objectStore('audioSettings');
+                const request = store.get('settings');
+
+                request.onsuccess = (event) => {
+                    const settings = event.target.result;
+                    if (settings) {
+                        audioPlayer.src = settings.audioSrc;
+                        audioPlayer.currentTime = settings.currentTime;
+                        audioPlayer.volume = settings.volume;
+                        volumeControl.value = settings.volume;
+                    }
+                };
+            };
+
+            audioFileInput.addEventListener('change', () => {
+                const file = audioFileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        audioPlayer.src = e.target.result;
+                        audioPlayer.play();
+                        saveAudioSettings();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            audioPlayer.addEventListener('timeupdate', saveAudioSettings);
+            audioPlayer.addEventListener('volumechange', () => {
+                saveAudioSettings();
+                volumeControl.value = audioPlayer.volume;
+            });
+
+            volumeControl.addEventListener('input', () => {
+                audioPlayer.volume = volumeControl.value;
+                saveAudioSettings();
+            });
+        });
+    </script>
+</body>
+</html>

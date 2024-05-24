@@ -638,7 +638,7 @@ async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
       urlProperties["timeFrame"] = timeFrame
       urlProperties["volume"] = volume
       fileDic[url] = urlProperties
-      setCookie("fileDic", fileDic, 10);
+      setCookie("fileDic", keepLastFiveElements(fileDic), 10);
       }
     } else{
       var fileDic = {};
@@ -687,10 +687,33 @@ fileInput.addEventListener('change', function(event) {
     const url = URL.createObjectURL(file);
     const name = file.name
       if (file.type.startsWith('audio/')) {
-          addAudioPlayer(url, name);
+          
+
+        let timeFrame = 0
+        let volume = 0
+        
+        var fileDic = getCookie("fileDic");
+        if (fileDic != null) {
+          for (let savedUrl in fileDic){
+            if (savedUrl == url || name == fileDic[savedUrl]["name"])
+              timeFrame = fileDic[savedUrl]["timeFrame"];
+              volume = fileDic[savedUrl]["volume"];
+            // addAudioPlayer(url, fileDic[url]["name"], fileDic[url]["timeFrame"], fileDic[url]["volume"]);
+          }
+        }
+        addAudioPlayer(url, name, timeFrame, volume);
       }
   }
 });
+
+
+function keepLastFiveElements(obj) {
+  let entries = Object.entries(obj);
+  if (entries.length > 5) {
+      entries = entries.slice(-5);
+  }
+  return Object.fromEntries(entries);
+}
 
 async function initFunc() {
   try{
@@ -704,13 +727,13 @@ async function initFunc() {
         }
       }
     };
-    var fileDic = getCookie("fileDic");
-    if (fileDic != null) {
-      for (let url in fileDic){
-        await addAudioPlayer(url, fileDic[url]["name"], fileDic[url]["timeFrame"], fileDic[url]["volume"]);
+    // var fileDic = getCookie("fileDic");
+    // if (fileDic != null) {
+    //   for (let url in fileDic){
+    //     await addAudioPlayer(url, fileDic[url]["name"], fileDic[url]["timeFrame"], fileDic[url]["volume"]);
 
-      }
-    }
+    //   }
+    // }
   }catch (error) {
     console.error('An error occurred during initialization:', error);
   }
