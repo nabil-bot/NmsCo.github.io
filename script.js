@@ -230,7 +230,6 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
       let newDic = getCookie("customListDic")
       newDic["currentIndex"]=currentPlaylistIndex
       setCookie("customListDic",newDic , 10);
-      alert(newDic["currentIndex"])
     }
   }
 
@@ -251,12 +250,10 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
       let newDic = getCookie("customListDic")
       newDic["currentIndex"]=currentPlaylistIndex
       setCookie("customListDic",newDic , 10);
-      alert(newDic["currentIndex"])
     }
   }
 
   initializeYouTubeAPI(iframe, volume, timeFrame);
-  
 
   if (customPlaylist)
     {
