@@ -3,13 +3,13 @@ let players = [];
 const volume = 50;
 const speed = 1;
 
-async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[], timeFrame=0) { //videoUrl could be playlist url
+async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[], timeFrame=0, currentPlaylistIndex=0, customPlaylist = false) { //videoUrl could be playlist url
   if (isPlaylist){
-    videoId = getVideoId(playlistVideos[0]);
+    videoId = getVideoId(playlistVideos[currentPlaylistIndex]);
   }else{
     videoId = getVideoId(videoUrl);
   }
-  let currentPlaylistIndex=0
+
   const videosContainer = document.getElementById('videos-container');
   const videoWrapper = document.createElement('div');
   videoWrapper.classList.add('video-wrapper');
@@ -117,8 +117,6 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
                       setCookie("urlDic", urlDic, 10);
                       console.log(urlDic[videoUrl]["timeFrame"])
                   }
-
-
               }
             } catch (error) {
               console.error('Error during onStateChange event:', error);
@@ -190,6 +188,12 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
   removeButton.addEventListener('click', function () {
     removeVideo(videoWrapper, videoUrl);
     
+
+    if (customPlaylist){
+      deleteCookie("customListDic")
+      return
+    }
+
     var urlDic = getCookie("urlDic");
     if (urlDic != null){
         if (videoUrl in urlDic){
@@ -221,6 +225,13 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
     const slider = videoWrapper.querySelector('.slider');
     initializeYouTubeAPI(iframe, slider.value);
     // alert("after init app")
+
+    if (customPlaylist){
+      let newDic = getCookie("customListDic")
+      newDic["currentIndex"]=currentPlaylistIndex
+      setCookie("customListDic",newDic , 10);
+      alert(newDic["currentIndex"])
+    }
   }
 
   function playPreviousVideoFromPlaylist(videoWrapper) {
@@ -236,10 +247,22 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
     const slider = videoWrapper.querySelector('.slider');
     initializeYouTubeAPI(iframe, slider.value);
     // if (players.indexOf(event.target) === -1) 
+    if (customPlaylist){
+      let newDic = getCookie("customListDic")
+      newDic["currentIndex"]=currentPlaylistIndex
+      setCookie("customListDic",newDic , 10);
+      alert(newDic["currentIndex"])
+    }
   }
 
   initializeYouTubeAPI(iframe, volume, timeFrame);
   
+
+  if (customPlaylist)
+    {
+      alert("in return")
+      return
+    }
   
   try {
         var urlDic = getCookie("urlDic");
@@ -260,8 +283,6 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
           setCookie("urlDic", urlDic, 10);
           urlDic = getCookie("urlDic");
         }
-
-
     } catch (error) {
         alert("An error occurred: " + error);
     }
@@ -671,7 +692,22 @@ async function filterLink(videoUrl, volume, timeFrame) {
         alert('An error occurred while retrieving video URLs. Please check your playlist URL or network connection.');
         reject(error);
       });
-    }else {
+    }else if (videoUrl.includes(",")){
+      let splitedUrls = videoUrl.split(", ")
+      addVideoPlayer(splitedUrls[0], volume, speed, true, splitedUrls, timeFrame,0, true); // No need to pass isPlaylist=true
+      
+      let customListDic = {}
+      customListDic["urls"] = splitedUrls
+      customListDic["currentIndex"] = 0
+      customListDic["volume"] = 100
+
+
+      setCookie("customListDic", customListDic, 10);
+      
+
+      resolve();
+    }
+    else {
       addVideoPlayer(videoUrl, volume, speed,false, [], timeFrame);
       resolve(); 
     }
@@ -734,6 +770,19 @@ async function initFunc() {
 
     //   }
     // }
+
+    var customListDic = getCookie("customListDic");
+    if (customListDic !== null) {
+
+      alert(customListDic["currentIndex"])
+      addVideoPlayer(customListDic["urls"][customListDic["currentIndex"]], volume, speed, true, customListDic["urls"], 0, customListDic["currentIndex"], customPlaylist=true); // No need to pass isPlaylist=true
+      
+      // let customListDic = {}
+      // customListDic["urls"] = splitedUrls
+      // customListDic["currentIndex"] = 0
+      // customListDic["volume"] = 100
+      
+    };
   }catch (error) {
     console.error('An error occurred during initialization:', error);
   }
