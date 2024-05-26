@@ -260,7 +260,6 @@ async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playl
 
   if (customPlaylist)
     {
-      alert("in return")
       return
     }
   
@@ -773,8 +772,6 @@ async function initFunc() {
 
     var customListDic = getCookie("customListDic");
     if (customListDic !== null) {
-
-      alert(customListDic["currentIndex"])
       addVideoPlayer(customListDic["urls"][customListDic["currentIndex"]], volume, speed, true, customListDic["urls"], 0, customListDic["currentIndex"], customPlaylist=true); // No need to pass isPlaylist=true
       
       // let customListDic = {}
