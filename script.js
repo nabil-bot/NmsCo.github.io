@@ -786,3 +786,39 @@ initFunc().then(() => {
 }).catch(error => {
   console.error('Initialization failed:', error);
 });
+
+
+
+
+
+  const checkbox = document.getElementById('trackCheckbox');
+  const clipboardTextField = document.getElementById('clipboardTextField');
+  let previousClipboard = '';
+
+  checkbox.addEventListener('change', function() {
+    if (this.checked) {
+      // Clear clipboard and start tracking
+      navigator.clipboard.writeText('').then(() => {
+        previousClipboard = '';
+        trackClipboard();
+      });
+    } else {
+      // Stop tracking
+      previousClipboard = '';
+    }
+  });
+
+  function trackClipboard() {
+    navigator.clipboard.readText().then(clipboard => {
+      if (clipboard !== previousClipboard) {
+        if (previousClipboard !== '') {
+          // Add comma and space if previous clipboard is not empty
+          clipboardTextField.value += ', ';
+        }
+        clipboardTextField.value += clipboard;
+        previousClipboard = clipboard;
+      }
+      // Continue tracking
+      setTimeout(trackClipboard, 1000);
+    });
+  }
