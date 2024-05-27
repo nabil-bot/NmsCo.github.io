@@ -798,7 +798,9 @@ initFunc().then(() => {
   checkbox.addEventListener('change', function() {
     if (this.checked) {
       // Clear clipboard and start tracking
-      navigator.clipboard.writeText('').then(() => {
+     
+alert("tracking");
+ navigator.clipboard.writeText('').then(() => {
         previousClipboard = '';
         trackClipboard();
       });
