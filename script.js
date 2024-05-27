@@ -791,11 +791,11 @@ initFunc().then(() => {
 
 
 
-  const checkbox = document.getElementById('trackCheckbox');
+  const Clipcheckbox = document.getElementById('trackCheckbox');
   const clipboardTextField = document.getElementById('clipboardTextField');
   let previousClipboard = '';
 
-  checkbox.addEventListener('change', function() {
+  Clipcheckbox.addEventListener('change', function() {
     if (this.checked) {
       // Clear clipboard and start tracking
      
