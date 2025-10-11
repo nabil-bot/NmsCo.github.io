@@ -1,1771 +1,1579 @@
 
-<!DOCTYPE html>
-<html lang="en">
+ <!doctype html>
+<html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NMS MultiPlayer</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
-  <!-- <link rel="stylesheet" href="css/all.min.css"> -->
-  <!-- <link rel="stylesheet" href="css/fontawesome.min.css"> -->
-
-  <!-- <link rel="stylesheet" href="styles.css"> -->
-  <!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Study Progress — Fullscreen Sheet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bangla:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="styles.css" /> -->
 
   <style>
-body {
-  font-family: Arial, sans-serif;
+
+    /* ========= Base ========= */
+:root {
+  --font: "Noto Sans Bangla", "Noto Sans Bengali", sans-serif;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --accent: #3b82f6;
+  --danger: #ef4444;
+  --muted: #64748b;
+  --border: #d1d5db;
+  --color-low: #fee2e2;
+  --color-mid: #fef3c7;
+  --color-high: #d1fae5;
+  --color-full: #86efac;
+  --font-base: 1rem;
+  --font-small: 0.875rem;
+  --font-large: 1.25rem;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: var(--font);
+  transition: background 0.15s, border 0.15s, color 0.15s;
+}
+
+html, body {
+  height: 100%;
   margin: 0;
+  background: var(--bg);
+  color: #0f172a;
+  font-size: var(--font-base);
+}
+
+/* ========= Topbar ========= */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 0.5rem;
+}
+
+.left-top, .right-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title-input {
+  padding: 0.5rem 0.75rem;
+  font-size: var(--font-large);
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  min-width: 12rem;
+  flex: 1;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  transition: transform 0.1s, background 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+button.danger {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+button.small {
+  font-size: var(--font-small);
+  padding: 0.25rem 0.5rem;
+}
+
+.icon-btn {
+  font-size: 1.125rem;
+  line-height: 1;
+  background: #eff6ff;
+  color: var(--accent);
+  padding: 0.375rem 0.5rem;
+}
+
+/* ========= Layout ========= */
+.main-full {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  height: calc(100vh - 4rem);
+  overflow: auto;
+}
+
+.subjects-container {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.overall-box {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ========= Subjects ========= */
+.subject {
   padding: 0;
-  background-color: #f2f9ff;
+  overflow: visible;
 }
 
-header {
-  background-color: #007bff;
-  color: #fff;
-  padding: 20px;
-  text-align: center;
-}
-
-h1 {
-  margin: 0;
-}
-
-#videos-container{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.audio-container{
-  width: 80%;
-  margin-top: 12px;
-  margin: 5px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 1px 6px 6px rgba(0, 0, 0, 0.1);
-}
-
-.audio-controls{
-  justify-content: center; 
-  flex-direction: column;
-  gap: 10px;
-}
-
-.otherAudioControllersContainer{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-
-
-
-.video-wrapper {
-  margin: 8%;
-  border: 1px solid #ccc;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 1px 6px 6px rgba(0, 0, 0, 0.1); 
-
-}
-
-.video-wrapper iframe {
-  width: 100%;
-  border-radius: 4px;
-}
-
-.input-group {
-  margin-bottom: 10px;
-}
-
-.slider {
-  width: 100%;
-}
-
-#controls {
-  text-align: center;
-  margin-top: 20px;
-}
-
-#controls input[type="text"] {
-  width: calc(90% - 42px); 
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-right: 10px;
-}
-
-#controls button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #007bff;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-#controls button:hover {
-  background-color: #0056b3;
-}
-
-
-@media screen and (max-width: 600px) {
-  #controls {
-    flex-direction: column;
-    align-items: center; 
-  }
-
-  #controls input[type="text"] {
-    width: calc(90% - 20px); 
-    margin-right: 0;
-  }
-
-  #controls button {
-    width: calc(50% - 15px);
-    margin-top: 10px;
-  }
-
-  .video-wrapper {
-    width: 100%;
-    padding-left: 2%;
-    padding-right: 2%;
-    padding-bottom: 3%;
-
-  }
-
-  #videos-container {
-    padding: 1px;
-  }
-
-}
-
-
-
-.volume-icon {
-
-  font-size: 1.2em;
-  color: #3363ff;
-}
-
-.video-controls {
+.subject-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
+  padding: 0.5rem 0.75rem;
+  background: #eff6ff;
+  color: #111827;
 }
 
-
-.volume-container {
-  display: flex; 
-  align-items: center; 
-}
-
-.remove-btn {
-  margin-left: 5px;
-	margin-bottom: 8px;
-  padding: 5px 10px;
-  border: none;
-  background-color: #eaedff; 
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.remove-btn:hover {
-  background-color: #d7dbff;
-}
-
-input[type="checkbox"] {
-  width: 24px;
-  height: 24px;
-  border: 2px solid #0099ff; 
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-label {
-  font-size: 18px;
-  color: #333;
-  cursor: pointer;
-}
-
-#globalControls {
-  margin-top: 40px;
+.subject-header .left {
   display: flex;
-  justify-content: center;
   align-items: center;
-  text-align: center; 
-  height: 100vh; 
+  gap: 0.5rem;
 }
 
-
-
-
-
-/* Global styles */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
-
-
-#videos-container {
+.subject-header .right {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  align-items: center;
+  gap: 0.375rem;
 }
 
-#controls {
-  text-align: center;
-  margin: 10px auto;
-	flex-direction: row;
-	
-}
-
-/* Styling for small screens (mobile) */
-@media screen and (max-width: 600px) {
-
-
-
-
-  header h1 {
-    font-size: 20px;
-  }
-}
-
-/* Styling for big screens (desktop) */
-@media screen and (min-width: 601px) {
-
-  .audio-container{
-    width: 40%;
-    margin-top: 16px;
-    margin: 5px;
-    border: 1px solid #ccc;
-    padding: 5px;
-    border-radius: 8px;
-    box-shadow: 1px 6px 6px rgba(0, 0, 0, 0.1);
-    justify-content: space-between;
-  }
-
-
-  header h1 {
-    font-size: 28px;
-  }
-  #videos-container {
-    padding: 100px;
-    
-  }
-}
-
-/* Styles for global controls */
-#goblaControls {
-  text-align: center;
-  margin-top: 20px;
-  padding-bottom: 5%;
-}
-
-/* Optional: Style the checkbox label */
-#goblaControls label {
-  margin-left: 5px;
-  font-size: 16px;
-  color: #333;
-  
-}
-
-
-
-
-
-.video-speed-select {
-  width: 50px;
-  height: 26px;
-  padding: 5px; /* Add some padding for better appearance */
-  font-size: 14px; /* Adjust font size */
-  border: 1px solid #ccc; /* Add border */
-  border-radius: 5px; /* Add border radius */
-  background-color: #fff; /* Background color */
-  color: #333; /* Text color */
-}
-
-/* Style for option elements */
-.video-speed-select option {
-  font-size: 14px; /* Adjust font size */
-  padding: 5px 10px; /* Add padding */
-}
-
-/* Optional: Hover effect for options */
-.video-speed-select option:hover {
-  background-color: #f0f0f0; /* Change background color on hover */
-}
-
-
-
-.next-btn, .previous-btn{
-  flex-grow: 1;
-  margin: 3px;
-
-}
-
-/* Style for the audio element */
-audio {
-  display: block;
-  width: 320px; /* Set your preferred width */
-  margin: 20px auto; /* Center the audio element */
-  background-color: #f3f3f3;
-  border-radius: 10px;
-  padding: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-/* Style for the audio controls */
-audio::-webkit-media-controls-panel {
-  border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.7);
-  position: relative;
-}
-/* Style for the audio timeline control */
-audio::-webkit-media-controls-timeline {
-  width: 100%; /* Take the whole width */
-  position: absolute;
-  bottom: 30px; /* Adjust top position to create space */
-}
-
-/* Style for the audio control buttons */
-audio::-webkit-media-controls-play-button,
-audio::-webkit-media-controls-pause-button,
-audio::-webkit-media-controls-volume-slider {
-  filter: invert(1); /* Invert button colors */
-}
-
-/* Style for the audio time display */
-audio::-webkit-media-controls-current-time-display,
-audio::-webkit-media-controls-time-remaining-display {
-  color: #fff;
-  font-size: 12px;
-  margin: 0 5px;
-}
-
-.AudioFileName{
+.subject-name {
+  font-size: var(--font-large);
   font-weight: 700;
-  font-size: 14px;
-	width: 100%;
- 	white-space: nowrap; /* Prevents text from wrapping */
-  overflow: hidden;    /* Hides the overflowing text */
-  text-overflow: ellipsis; /* Adds an ellipsis (…) to indicate clipped text */
-  display: block;      /* Ensure the label behaves like a block element */
-	margin-top: 5px;
-	margin-bottom: 8px;
+  min-width: 7.5rem;
+  border-bottom: 2px solid transparent;
 }
 
-.audio-controls {
-  display: flex; 
-  /* align-items: center; */
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
-}
-
-.audio-controls input[type="range"] {
-  width: 100%;
-  /* margin: 0 10px; */
-}
-
-.audio-controls select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.audio-play-pause{
-  padding: 8px 16px;
-
-}
-
-
-.group-container {
-  margin-top: 20px;
-  padding-top: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  background-color: #f9f9f9;
-}
-
-.remove-container{
-  margin: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-/*  justify-content: space-between;*/
-}
-
-.sliderContainer{
-  display: flex;
-  justify-content: space-between;
-  align-items: center; /* Optional: Align items vertically center */
-  padding: 10px; 
-}
-
-
-
-.slider-container {
-  flex-direction: column;
-  /* width: 90%; */
-  padding: 10px;
-  background-color: #f0f0f0; /* Optional: Adds a background color */
-  border: 1px solid #ccc; /* Optional: Adds a border */
-  border-radius: 5px; /* Optional: Rounds the corners of the container */
-  margin-bottom: 5px;
-}
-
-.timeline-slider {
-  width: 100%;
-  margin-bottom: 10px; /* Adds space between the slider and the labels */
-}
-
-.timeline-slider {
-  width: 100%;
-  height: 10px;
-  background: #ddd;
-  border-radius: 5px;
+.subject-name:focus {
+  border-color: var(--accent);
   outline: none;
-  -webkit-appearance: none;
 }
 
-.timeline-slider::-webkit-slider-thumb {
-  width: 25px;
-  height: 20px;
-  background: #4CAF50;
-  border-radius: 10%;
-  cursor: pointer;
+.subject-progress-wrap {
+  background: #f1f5f9;
+  height: 0.625rem;
+  margin: 0.375rem 0.5rem 0.5rem;
+  border-radius: 9999px;
+  overflow: hidden;
 }
 
-.timeline-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: #4CAF50;
-  border-radius: 50%;
-  cursor: pointer;
+.subject-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 9999px;
+  transition: width 0.25s ease;
 }
 
-
-
-
-.timelabelContainer {
+/* ========= Parts ========= */
+.parts-row {
   display: flex;
-  flex-direction: row;
-	justify-content: space-between;
-  /* height: 15px; */
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 0.5rem;
 }
 
-.time-label {
-  font-size: 14px; /* Adjust font size as needed */
+.part-col {
+  flex: 1;
+  min-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: #f9fafb;
 }
 
-
-.video-speed-label{
-  padding-right: 6px;
+.part-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f3f4f6;
+  border-bottom: 1px solid var(--border);
+  padding: 0.375rem 0.5rem;
 }
 
-	  #file-input {
-            display: none;
-        }
+.part-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
 
-        .file-input-label {
-            display: inline-block;
-            color: white;
-			background-color: #92FF93;
-            padding: 10px 20px; /* Add padding */
-            font-size: 16px; /* Adjust font size */
-            border-radius: 5px; /* Rounded corners */
-            cursor: pointer; /* Pointer cursor on hover */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
+.part-name:focus {
+  outline: none;
+  border-bottom: 2px solid var(--accent);
+}
 
-        .file-input-label:hover {
-            background-color: #45a049; /* Darker green on hover */
-        }
+.part-actions {
+  display: flex;
+  gap: 0.375rem;
+}
 
-        .file-input-label:active {
-            transform: scale(0.98); /* Slightly shrink on click */
-        }
+/* ========= Chapters ========= */
+.chapters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.375rem;
+}
 
-        .file-name {
-            margin-top: 10px;
-            font-size: 14px;
-            font-family: Arial, sans-serif;
-            color: #555; /* Subtle text color */
-        }
+.chapter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.375rem;
+  background: #fff;
+}
 
+.chapter-row input[type="checkbox"] {
+  transform: scale(1.2);
+}
 
+.chap-name {
+  flex: 1;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+}
 
+.chap-name:focus {
+  border-color: var(--accent);
+  outline: none;
+}
 
+.chap-goal, .chap-solved {
+  min-width: 4rem;
+  text-align: center;
+  font-size: var(--font-small);
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Increased gap for spacing */
+}
 
-      /* Style for the menu button */
-.MenuButton-class {
-  /* background-color: #007BFF; */
-  color: black;
-  border: none;
-  padding: 4px 8px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-flex;
+.goal-value, .solved-value {
+  display: inline-block;
+  min-width: 2rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  background: #f9fafb;
+  text-align: center;
+  /* user-select: none;  */
+}
+
+.solved-inc, .solved-dec {
+  width: 2.5rem; /* Larger buttons */
+  height: 2.5rem;
+  line-height: 1;
+  font-size: 1rem; /* Larger font for clarity */
+  background: #e0e7ff;
+  color: var(--accent);
+  border-radius: 0.25rem;
+  padding: 0.5rem; /* Larger touch target */
+  display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 6px;
 }
 
-/* Style for the Font Awesome icon inside the button */
-.MenuButton-class i {
+.solved-inc:hover, .solved-dec:hover {
+  background: #dbeafe;
+}
+
+.chap-progress {
+  flex: 1;
+  min-width: 4rem;
+  height: 0.5rem;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chap-progress .fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.25s ease;
+}
+
+.chap-progress span {
+  position: absolute;
+  top: -1.125rem;
+  right: 0.125rem;
+  font-size: 0.6875rem;
+  color: #475569;
+}
+
+/* ========= Side Panel (Right) ========= */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+/* Cards in side panel */
+.card h4 {
+  margin-top: 0;
+}
+
+.big-pct {
+  font-weight: 700;
+  font-size: 1.375rem;
+  color: var(--accent);
+}
+
+.progress-wrap {
+  width: 100%;
+  height: 0.625rem;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s;
+}
+
+.overall-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: var(--font-small);
+}
+
+/* ========= Settings Panel ========= */
+.settings-panel {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  max-width: 22.5rem;
+  height: 100vh;
+  background: var(--card);
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  z-index: 999;
+}
+
+.settings-panel.open {
+  right: 0;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.settings-header h3 {
   margin: 0;
 }
 
-/* Dropdown menu styles */
-.dropdown-menu {
-  position: absolute;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  overflow: hidden;
+.settings-body {
+  padding: 0.875rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.625rem;
+}
+
+.setting-row label {
+  flex: 1;
+  font-weight: 500;
+}
+
+.setting-row input[type="color"],
+.setting-row select {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.empty-note {
+  text-align: center;
+  color: var(--muted);
+  margin-top: 1.25rem;
+}
+
+::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+#saveIndicator {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.5rem;
+  background: #1e293b;
+  color: #fff;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: var(--font-small);
+  opacity: 0;
+  transform: translateY(0.625rem);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
   z-index: 1000;
 }
 
-/* Menu item styles */
-.menu-item {
-  padding: 10px 15px;
+#saveIndicator.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.subject-header .left {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.color-picker-wrap {
+  position: relative;
+  width: 0.75rem;
+  height: 2rem;
+  border-radius: 0.375rem;
   cursor: pointer;
-  font-size: 14px;
-  color: #333;
-  text-align: left;
+  flex-shrink: 0;
 }
 
-.menu-item:hover {
-  background-color: #007BFF;
-  color: #fff;
+.color-picker-wrap input[type="color"] {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  background: none;
 }
+
+.color-picker-wrap:hover {
+  transform: scaleX(1.2);
+  filter: brightness(1.05);
+  transition: all 0.2s ease;
+}
+
+/* ========= Media Queries for Responsiveness ========= */
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.5rem;
+  }
+
+  .left-top, .right-top {
+    justify-content: center;
+  }
+
+  #overallBox {
+    margin: 0.5rem 0;
+  }
+
+  .title-input {
+    min-width: auto;
+  }
+
+  .main-full {
+    padding: 0.5rem;
+  }
+
+  .subjects-container {
+    padding-right: 0;
+  }
+
+  button {
+    padding: 0.625rem 1rem;
+  }
+
+  .icon-btn {
+    padding: 0.5rem;
+  }
+
+  .settings-panel {
+    width: 100%;
+  }
+}
+
+@media (min-width: 769px) {
+  .topbar {
+    flex-wrap: nowrap;
+  }
+
+  .overall-box {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .parts-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .part-col {
+    min-width: 16rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --font-base: 0.9375rem;
+    --font-small: 0.8125rem;
+    --font-large: 1.125rem;
+  }
+
+  /* Better spacing and readability for mobile */
+  .chapters-list {
+    gap: 0.625rem;
+  }
+
+  .chapter-row {
+    display: grid;
+    grid-template-columns: 1.75rem 1fr auto;
+    grid-template-areas:
+      "check name del"
+      "goal solved solved"
+      "prog prog prog";
+    gap: 0.375rem;
+    align-items: center;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.625rem;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+  }
+
+  /* More distinct look and spacing */
+  .chapter-row:nth-child(odd) {
+    background: #f8fafc;
+  }
+
+  .chap-check {
+    grid-area: check;
+    transform: scale(1.3);
+    justify-self: center;
+  }
+
+  .chap-name {
+    grid-area: name;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #0f172a;
+    padding-left: 0.25rem;
+    word-break: break-word;
+  }
+
+  .chap-goal {
+    grid-area: goal;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #334155;
+    /* === NEW FIX === */
+  position: relative; /* Required for z-index to work */
+  z-index: 10;      /* Ensure this element is above all others in the row */
+  /* ============= */
+  }
+
+  .chap-solved {
+    grid-area: solved;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #334155;
+  }
+
+  .goal-value,
+  .solved-value {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+
+  .solved-inc,
+  .solved-dec {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.125rem;
+    font-weight: bold;
+    background: #e0e7ff;
+    color: var(--accent);
+    border: 1px solid #c7d2fe;
+    border-radius: 0.375rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .solved-inc:active,
+  .solved-dec:active {
+    background: #dbeafe;
+  }
+
+  .chap-progress {
+    grid-area: prog;
+    width: 100%;
+    height: 0.625rem;
+    background: #e2e8f0;
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-top: 0.25rem;
+  }
+
+  .chap-progress .fill {
+    height: 100%;
+    transition: width 0.3s ease;
+    background: var(--accent);
+  }
+
+  .chap-progress span {
+    display: none; /* hide % label on small screens to save space */
+  }
+
+  .chapter-row .del-ch {
+    grid-area: del;
+    justify-self: end;
+    font-size: 1rem;
+    color: var(--danger);
+    background: none;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .part-col {
+    border-radius: 0.75rem;
+    padding: 0.375rem;
+    background: #f9fafb;
+  }
+
+  .part-header {
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    background: #e2e8f0;
+  }
+
+  .part-name {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  /* Increase tap area for adding/removing chapters */
+  .part-actions button {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
+}
+
+
+/* ========= Hide toolbar animation ========= */
+.right-top {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.right-top.hide-toolbar {
+  transform: translateY(-100%);
+  opacity: 0;
+  /* REMOVED: pointer-events: none; */
+}
+
+
+.hide-toolbar {
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+
+@media (max-width: 768px) {
+  /* smooth transitions */
+  .topbar {
+    transition: height .22s ease, padding .22s ease, opacity .22s ease;
+  }
+
+  /* collapsed state reduces topbar size and hides title */
+  .topbar.collapsed {
+    padding: 6px 8px;
+    height: 48px; /* adjust if you want it smaller/larger */
+    overflow: visible;
+  }
+
+  /* hide the visible title input to free height */
+  .topbar.collapsed .title-input {
+    display: none;            /* remove title from layout so header gets smaller */
+  }
+
+  /* hide the right-top and overall-box */
+  .right-top, #overallBox {
+    transition: transform .22s ease, opacity .22s ease, height .22s ease, margin .22s ease, padding .22s ease;
+  }
+  .right-top.hide-toolbar, #overallBox.hide-toolbar {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* optional: keep the settings icon visible and aligned */
+  .topbar .left-top { align-items: center; gap: 8px; }
+}
+
+/* ===== Scroll Hide (Mobile) ===== */
+@media (max-width: 768px) {
+  .topbar {
+    transition: all 0.3s ease;
+  }
+
+  /* Collapsed topbar - smaller height */
+  .topbar.collapsed {
+    padding: 0.25rem 0.5rem;
+    height: 3rem;
+    overflow: hidden;
+  }
+
+  /* Hide unnecessary parts */
+  .hide-toolbar {
+    opacity: 0;
+    transform: translateY(-100%);
+    pointer-events: none;
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Show title clearly when others hidden */
+  #titleInput.only-title {
+    display: block !important;
+    opacity: 1 !important;
+    width: 100%;
+    max-width: 90%;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+  }
+
+  /* Subtle fade-in/out */
+  .topbar.collapsed #titleInput.only-title {
+    transition: opacity 0.3s ease;
+  }
+}
+
+
+
+
+/* ========= Swipe-to-Delete Styles ========= */
+/* This ensures the content can be moved without affecting the row's boundaries */
+.chapter-content {
+  display: contents; 
+  position: relative;
+  /* Add z-index to ensure it sits on top when not swiped */
+  z-index: 2; /* Set content higher than the button initially */
+  transition: transform 0.3s ease-out;
+  cursor: grab;
+}
+
+/* This is the class applied by JS when swiped */
+.chapter-row.swiped .chapter-content {
+  transform: translateX(-5rem); /* slides the content left */
+}
+
+/* Position and style the delete button for the swipe action */
+.delete-swipe-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5rem; 
+  height: 100%;
+  background-color: var(--danger);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  /* Reduce z-index to sit behind the content until revealed */
+  z-index: 1; 
+  border-radius: 0 0.375rem 0.375rem 0; 
   
+  /* Hides the button by pushing it 100% of its width outside the row */
+  transform: translateX(100%); 
+  transition: transform 0.3s ease-out;
+  /* REMOVE ALL OPACITY RULES */
+}
+
+.chapter-row.swiped .delete-swipe-btn {
+  /* === FIX: Show when swiped === */
+  opacity: 1;
+  transform: translateX(0); /* Slide into view */
+}
+
+/* Ensure the chapter-row has a relative position for absolute positioning of the delete button */
+.chapter-row {
+  position: relative; 
+  overflow: hidden;
+  /* ... existing styles ... */
+}
 
 
+.delete-swipe-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5rem; 
+  height: 100%;
+  background-color: var(--danger);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1; /* Keep it below the content layer */
+  border-radius: 0 0.375rem 0.375rem 0; 
+  
+  /* === FIX 1: Start outside the row's boundary === */
+  /* We use transform to keep it visually hidden to the right */
+  transform: translateX(100%); 
+  transition: transform 0.3s ease-out;
+}
+
+/* === FIX 2: Reveal the button when swiped === */
+.chapter-row.swiped .delete-swipe-btn {
+  transform: translateX(0); /* Slides the button into position */
+}
+
+/* Click animation */
+.solved-inc.animate {
+  animation: pop 0.3s forwards;
+}
+
+/* Keyframes for pop */
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
   </style>
-
-
 </head>
 <body>
-  <header>
-    <h1>Nms MultiPlayer</h1>
-  </header>
-  <div id="videos-container">
-    <!-- Videos will be dynamically added here -->
-  </div>
+  <div id="app">
+    <header class="topbar">
+      <div class="left-top">
+        <input id="titleInput" class="title-input" placeholder="ড্যাশবোর্ড শিরোনাম লিখুন..." />
+        <button id="btnSettings" class="icon-btn" title="Settings">⚙</button>
+      </div>
+      <div id="overallBox" class="card overall-box">
+          <div class="overall-row">
+            <div id="overallSummary" class="muted small">Overall Progress:</div>
+            <div id="overallPct" class="big-pct">0%</div>
+          </div>
+          <div class="progress-wrap">
+            <div id="overallBar" class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      <div class="right-top">
+        <button id="btnAddSubject" class="primary">＋ Subject</button>
+        <button id="btnExport">Export</button>
+        <button id="btnImport">Import</button>
+        <input id="importFile" type="file" accept="application/json" style="display:none"/>
+        <button id="btnClear" class="danger">Clear</button>
+      </div>
+    </header>
+    <main class="main-full">
+      <section id="subjectsContainer" class="subjects-container">
+        <div class="empty-note">No subjects yet — click "＋ Subject" to add one.</div>
+      </section>
+      <aside class="side-panel">
+        <div id="settingsPanel" class="settings-panel hidden">
+          <div class="settings-header">
+            <h3>Settings</h3>
+            <button id="closeSettings" class="icon-btn">✕</button>
+          </div>
+          <div class="settings-body">
+            <div class="setting-row">
+              <label>Overall progress mode</label>
+              <select id="calcMode">
+                <option value="chapters">A — By chapter count (completed / total)</option>
+                <option value="goals">B — By goals (sum solved / sum goals)</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label>Default subject color</label>
+              <input id="defaultColor" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color (0–33%)</label>
+              <input id="colorLow" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color (34–66%)</label>
+              <input id="colorMid" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color (67–99%)</label>
+              <input id="colorHigh" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color (100%)</label>
+              <input id="colorFull" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color intensity</label>
+              <select id="colorIntensity">
+                <option value="light">Light (good text contrast)</option>
+                <option value="normal">Normal</option>
+              </select>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+              <button id="saveSettings" class="primary small">Save</button>
+              <button id="resetColors" class="small">Reset</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
 
-  <div id="controls">
-    <div style="display: flex;  gap: 8px; justify-content: center; margin-left: 20px;">
-      <input type="text" id="video-url" placeholder="Enter Video URL">
-      <button id="clear-button" style="padding: 3px; background: transparent; color: #333; width: 30px; padding-right: 10px; margin-right: 20px; font-size: 24px;"><i class="fa-regular fa-circle-xmark"></i></button>
+    <!-- templates (not visible) -->
+    <template id="subjectTpl">
+      <div class="subject card">
+        <div class="subject-header">
+          <div class="left">
+            <div class="color-picker-wrap">
+              <input class="subject-color" type="color" title="Subject color"/>
+            </div>
+            <div class="subject-name name" contenteditable="true" spellcheck="false">নতুন বিষয়</div>
+          </div>
+          <div class="right">
+            <div class="subject-pct small muted">0%</div>
+            <button class="add-part small">＋ Part</button>
+            <button class="remove-subject small danger">Delete</button>
+          </div>
+        </div>
+
+        <div class="subject-progress-wrap">
+          <div class="subject-progress-bar"><div class="subject-progress-fill" style="width:0%"></div></div>
+        </div>
+
+        <div class="parts-row">
+          <div class="part-col">
+            <div class="part-header">
+              <div class="part-name name" contenteditable="true" spellcheck="false">Part 1</div>
+              <div class="part-actions">
+                <button class="add-chapter small">＋ Chapter</button>
+                <button class="remove-part small danger">Delete</button>
+              </div>
+            </div>
+            <div class="chapters-list"></div>
+          </div>
+          <div class="part-col">
+            <div class="part-header">
+              <div class="part-name name" contenteditable="true" spellcheck="false">Part 2</div>
+              <div class="part-actions">
+                <button class="add-chapter small">＋ Chapter</button>
+                <button class="remove-part small danger">Delete</button>
+              </div>
+            </div>
+            <div class="chapters-list"></div>
+          </div>
+        </div>
+      </div>
+    </template>
+<template id="chapterTpl">
+  <div class="chapter-row">
+    <div class="delete-swipe-btn" title="Swipe to delete">
+        🗑
     </div>
-    <button id="paste-btn"><i class="fa-regular fa-paste"></i> Paste</button>
-    <button id="add-video-btn"><i class="fa-solid fa-plus"></i> Add Video</button>
+
+    <div class="chapter-content">
+      <input class="chap-check" type="checkbox" title="mark complete"/>
+      <div class="chap-name name" contenteditable="true" spellcheck="false">Chapter</div>
+      <div class="chap-goal small muted">Goal: <span class="goal-value">0</span></div>
+      <div class="chap-solved small muted">Solved: <span class="solved-value">0</span>
+      </div>
+      <div class="chap-progress"><div class="fill" style="width:0%"></div><span>0%</span></div>
+      <div class="chap-actions">
+        <button class="del-ch small danger">X</button>
+      </div>
+    </div>
   </div>
-  <div id="goblaControls">
-
-  <div class="group-container">
-    
-	  <input type="file" id="file-input" class="hidden-input" accept="audio/*" multiple>
-	  <label for="file-input" class="file-input-label"><i class="fa-regular fa-file"></i> Add a local file</label>
-	  
-<!--	  <button onClick="selectFileUsingExpo()">Expo picker</button>-->
-	  
-	  </div>
-	  
-	  
+</template>
   </div>
-    <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- <script src="app.js" defer></script> -->
+   <script>
 
+    (() => {
+  /* ==================== Scroll Hide for Toolbar (Mobile Only) ==================== */
+  /* ==================== Scroll Hide for Toolbar (Mobile Only) ==================== */
+const topbar = document.querySelector('.topbar');
+const rightTop = document.querySelector('.right-top');
+const overallBox = document.getElementById('overallBox');
+const titleInput = document.getElementById('titleInput');
+const subjectsScroll = document.getElementById('subjectsContainer');
 
-    <script>
+if (topbar && rightTop && overallBox && titleInput) {
+  let lastScroll = 0;
+  const THRESH = 25;
 
+  const getScroll = () =>
+    subjectsScroll && subjectsScroll.scrollHeight > subjectsScroll.clientHeight
+      ? subjectsScroll.scrollTop
+      : window.pageYOffset || document.documentElement.scrollTop || 0;
 
-
-// working code ========================================
-
-document.addEventListener('visibilitychange', function (event) {
-{
-  if (document.visibilityState === 'visible') {
-
-  } 
-  else {
-    document.hidden = false;
-    document.visibilityState = 'visible';
-    players.forEach(player => {
-      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-        player.playVideo(); // Resume playback if the player was playing
-      }
-    });
-
-    event.stopImmediatePropagation();
-    return 
-  }
-} 
-});
-
-
-
-
-// working code ========================================
-
-
-
-
-let videoCount = 0;
-let players = [];
-const volume = 50;
-const speed = 1;
-
-async function addVideoPlayer(videoUrl, volume, speed, isPlaylist = false, playlistVideos=[], timeFrame=0, currentPlaylistIndex=0, customPlaylist = false) { //videoUrl could be playlist url
-  if (isPlaylist){
-    videoId = getVideoId(playlistVideos[currentPlaylistIndex]);
-  }else{
-    videoId = getVideoId(videoUrl);
-  }
-
-  if (videoId == null) { // Handles both null and undefined
-    return;
-  }
-
-  const videosContainer = document.getElementById('videos-container');
-  const videoWrapper = document.createElement('div');
-  videoWrapper.classList.add('video-wrapper');
-  const iframe = document.createElement('iframe');
-  // iframe.width = '';
-  iframe.height = '240';
-
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-  iframe.frameborder = '0';
-  iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
-  iframe.allowFullscreen = true;
-  
-  
-  const volumeContainer = document.createElement('div');
-  volumeContainer.classList.add('volume-container');
-  const speakerIcon = document.createElement('i');
-  speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
-  volumeContainer.appendChild(speakerIcon);
-  const volumeSlider = document.createElement('input');
-  volumeSlider.type = 'range';
-  volumeSlider.min = 0;
-  volumeSlider.max = 100;
-  volumeSlider.value = volume;
-  volumeSlider.classList.add('slider');
-  volumeContainer.appendChild(volumeSlider);
-  
-  volumeSlider.addEventListener('input', function () {
-    setVolume(videoWrapper, volumeSlider.value);
-
-    var urlDic = getCookie("urlDic");
-    if (urlDic !== null) {
-      if (videoUrl in urlDic){
-        urlDic[videoUrl]["volume"] = volumeSlider.value;
-        setCookie("urlDic", urlDic, 10);
-      } 
-    }
-  });
-  speakerIcon.addEventListener('click', function() {
-    if (volumeSlider.value > 0){
-      setVolume(videoWrapper, 0);
-    }else if (volumeSlider.value == 0) {
-      setVolume(videoWrapper, 50);
-    }
-  });
-  const videoControlsWrapper = document.createElement('div');
-  videoControlsWrapper.classList.add('video-controls');
-  
-  
-  // const videoSpeedWrapper = document.createElement('div');
-  // videoSpeedWrapper.classList.add('video-speed-wrapper');
-  // const videoSpeedLabel = document.createElement('label');
-  // videoSpeedLabel.textContent = 'Speed:';
-  // videoSpeedLabel.classList.add('video-speed-label');
-  // videoSpeedWrapper.appendChild(videoSpeedLabel);
-  // const videoSpeedSelect = document.createElement('select');
-  // videoSpeedSelect.classList.add('video-speed-select');
-  // videoSpeedSelect.innerHTML = `
-  //   <option value="0.25">0.25x</option>
-  //   <option value="0.5">0.5x</option>
-  //   <option value="0.75">0.75x</option>
-  //   <option value="1" selected>1x</option>
-  //   <option value="1.1">1.1x</option>
-  //   <option value="1.15">1.15x</option>
-  //   <option value="1.25">1.25x</option>
-  //   <option value="1.5">1.5x</option>
-  //   <option value="2">2x</option>
-  // `;
-  // videoSpeedSelect.value = speed;
-  // videoSpeedSelect.addEventListener('change', function () {
-  //   setSpeed(videoWrapper, videoSpeedSelect.value);
-  // });
-  // videoSpeedWrapper.appendChild(videoSpeedSelect);
-  
-  
-  
-
-
-  const MenuButton = document.createElement('button');
-MenuButton.className = 'MenuButton-class';
-const icon = document.createElement('i');
-icon.className = 'fas fa-bars'; // Add Font Awesome classes for the menu icon
-MenuButton.appendChild(icon);
-
-// Create the dropdown menu
-const menu = document.createElement('div');
-menu.className = 'dropdown-menu';
-menu.style.display = 'none'; // Hide the menu initially
-
-// Add menu items
-const menuItems = [
-  { text: 'Reload', iconClass: 'fas fa-redo' },
-  { text: 'Set Pause Timer', iconClass: 'fas fa-pause' },
-  { text: 'Copy Link', iconClass: 'fas fa-copy' }
-];
-menuItems.forEach(item => {
-  const menuItem = document.createElement('div');
-  menuItem.className = 'menu-item';
-
-  // Create and append the icon
-  const menuIcon = document.createElement('i');
-  menuIcon.className = item.iconClass;
-  menuIcon.style.marginRight = '10px'; // Add spacing between icon and text
-  menuItem.appendChild(menuIcon);
-
-  // Add text content
-  menuItem.appendChild(document.createTextNode(item.text));
-
-  // Add click functionality
-  menuItem.addEventListener('click', () => {
-    // alert(`You clicked: ${item.text}`);
-
-    if (item.text == 'Reload'){
-    const src = iframe.src; // Get the current source URL
-    iframe.src = ""; // Clear the src temporarily
-    setTimeout(() => {
-      iframe.src = src; // Reapply the same source URL
-    }, 10); // Short delay to ensure reload
-    }
-
-
-    if (item.text === 'Set Pause Timer') {
-      pauseVideo()
-    } 
-
-
-
-    menu.style.display = 'none'; // Hide the menu after clicking
-  });
-
-  menu.appendChild(menuItem);
-});
-
-// Append the menu to the document body
-document.body.appendChild(menu);
-
-// Toggle menu visibility on button click
-MenuButton.addEventListener('click', (e) => {
-  // Prevent click from propagating to the document
-  e.stopPropagation();
-
-  // Toggle menu visibility
-  if (menu.style.display === 'none' || menu.style.display === '') {
-    // Position the menu relative to the button
-    const rect = MenuButton.getBoundingClientRect();
-    menu.style.top = `${rect.bottom + window.scrollY}px`;
-    menu.style.left = `${rect.left + window.scrollX}px`;
-    menu.style.display = 'block';
-  } else {
-    menu.style.display = 'none';
-  }
-});
-
-// Hide the menu when clicking outside
-document.addEventListener('click', () => {
-  menu.style.display = 'none';
-});
-
-// Prevent the menu from hiding when clicking inside it
-menu.addEventListener('click', (e) => {
-  e.stopPropagation();
-});
-  // menu btn =======================================================================
-
-
-  videoControlsWrapper.appendChild(MenuButton);
-  // videoControlsWrapper.appendChild(videoSpeedWrapper);
-    
-
-  
-  function initializeYouTubeAPI(iframe, volume, timeFrame) {
-    function createPlayer() {
-      const player = new YT.Player(iframe, {
-        events: {
-          'onReady': function (event) {
-            try {
-              event.target.setVolume(volume);
-              event.target.seekTo(timeFrame);
-              if (players.indexOf(event.target) === -1) {
-                players.push(event.target);
-              } else {
-                console.log('Player already exists in players array');
-              }
-            } catch (error) {
-              console.error('Error during onReady event:', error);
-            }
-          },
-          'onStateChange': function (event) {
-            try {
-              if (event.data === YT.PlayerState.ENDED) {
-                playNextVideoFromPlaylist(videoWrapper);
-                // console.log('Video ended, playing next video from playlist');
-              } else if (event.data === YT.PlayerState.PAUSED){
-
-                  var urlDic = getCookie("urlDic");
-                  if (urlDic != null){
-                    if (videoUrl in urlDic)
-
-                      var floatNumber = player.getCurrentTime();
-                      var intNumber = Math.floor(floatNumber);   
-                      urlDic[videoUrl]["timeFrame"]=  intNumber;
-                      setCookie("urlDic", urlDic, 10);
-                      console.log(urlDic[videoUrl]["timeFrame"])
-                  }
-              }
-            } catch (error) {
-              console.error('Error during onStateChange event:', error);
-            }
-          }
-        },
-        'onPlaybackQualityChange': function (event) {
-          // This function will be called when playback quality changes
-          // alert(player.getPlaybackQuality());
-          console.log(event.target.getPlaybackQuality());
-        }
-        ,
-        playerVars: {
-          // Add additional parameters if needed
-        }
-      });
-
-      // Optional: Check if the player instance is created successfully
-      if (!player) {
-        console.error('Failed to create YouTube player instance');
-      } else {
-        console.log('YouTube player instance created successfully');
-      }
-    }
-
-    function waitForYouTubeAPI() {
-      if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
-        // console.log('YouTube IFrame API is not yet loaded. Waiting...');
-        setTimeout(waitForYouTubeAPI, 100); // Retry after 100 milliseconds
-      } else {
-        createPlayer();
-      }
-    }
-    waitForYouTubeAPI();
-  } // initializeYouTubeAPI function ends here
-
-
-  function pauseVideo() {
-  // Ask the user for input in seconds
-  const timeInSeconds = prompt('Enter the time in seconds to pause the player:');
-
-  // Validate the input
-  if (timeInSeconds && !isNaN(timeInSeconds) && timeInSeconds > 0) {
-    alert(`Player will pause in ${timeInSeconds} seconds.`);
-    
-    // Find the active player (if multiple players are used)
-    const activePlayer = players.find(player => player.getIframe() === iframe);
-    if (activePlayer) {
-      setTimeout(() => {
-        activePlayer.pauseVideo(); // Pause the video after the specified time
-      }, timeInSeconds * 1000); // Convert seconds to milliseconds
-    } else {
-      console.error('No active player found.');
-    }
-  } else {
-    alert('Invalid input. Please enter a valid number.');
-  }
-}
-
-
-  if (isPlaylist) {
-    const previousButton = document.createElement('button');
-    previousButton.textContent = '⏮';
-    previousButton.classList.add('previous-btn');
-    previousButton.addEventListener('click', function () {
-      playPreviousVideoFromPlaylist(videoWrapper);
-    });
-    videoControlsWrapper.appendChild(previousButton);
-
-    const nextButton = document.createElement('button');
-    nextButton.textContent = '⏭';
-
-    nextButton.classList.add('next-btn');
-    nextButton.addEventListener('click', function () {
-      playNextVideoFromPlaylist(videoWrapper);
-    });
-    videoControlsWrapper.appendChild(nextButton);
-
-    previousButton.style.height = '26px';
-    nextButton.style.height = '26px';
-    previousButton.style.fontSize = '15px';
-    nextButton.style.fontSize = '16px';
-
-    var label = document.createElement('label');
-    label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
-    label.style.fontSize = '14px';
-    videoControlsWrapper.appendChild(label);
-    }
-
-  const removeButton = document.createElement('button');
-  removeButton.textContent = '❌';
-  removeButton.classList.add('remove-btn');
-  removeButton.addEventListener('click', function () {
-    removeVideo(videoWrapper, videoUrl);
-    
-
-    if (customPlaylist){
-      deleteCookie("customListDic")
-      return
-    }
-
-    var urlDic = getCookie("urlDic");
-    if (urlDic != null){
-        if (videoUrl in urlDic){
-          delete urlDic[videoUrl]
-          if (Object.keys(urlDic).length == 0){
-              deleteCookie("urlDic");
-          }else{
-              setCookie("urlDic", urlDic, 10);
-          }
-        }} 
-  });
-  videoControlsWrapper.appendChild(removeButton);
-  videoWrapper.appendChild(iframe);
-  videoWrapper.appendChild(volumeContainer);
-  videoWrapper.appendChild(videoControlsWrapper);
-  
-  videosContainer.appendChild(videoWrapper);
-
-
-  function playNextVideoFromPlaylist(videoWrapper) {
-    if (playlistVideos.length === 0) {
+  function handleScroll() {
+    if (window.innerWidth > 768) {
+      // reset on desktop
+      topbar.classList.remove('collapsed');
+      rightTop.classList.remove('hide-toolbar');
+      overallBox.classList.remove('hide-toolbar');
+      titleInput.classList.remove('only-title');
+      lastScroll = getScroll();
       return;
     }
 
-    currentPlaylistIndex = (currentPlaylistIndex + 1) % playlistVideos.length;
+    const current = getScroll();
+    const diff = current - lastScroll;
+    if (Math.abs(diff) < THRESH) return;
 
-    label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
-    const nextVideoUrl = playlistVideos[currentPlaylistIndex];
-    const videoId = getVideoId(nextVideoUrl);
-    const iframe = videoWrapper.querySelector('iframe');
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-    const slider = videoWrapper.querySelector('.slider');
-    initializeYouTubeAPI(iframe, slider.value);
-    // alert("after init app")
-
-    if (customPlaylist){
-      let newDic = getCookie("customListDic")
-      newDic["currentIndex"]=currentPlaylistIndex
-      setCookie("customListDic",newDic , 10);
+    if (diff > 0 && current > 50) {
+      // scrolling down → collapse all except title
+      topbar.classList.add('collapsed');
+      rightTop.classList.add('hide-toolbar');
+      overallBox.classList.add('hide-toolbar');
+      titleInput.classList.add('only-title');
+    } else if (diff < 0) {
+      // scrolling up → expand everything
+      topbar.classList.remove('collapsed');
+      rightTop.classList.remove('hide-toolbar');
+      overallBox.classList.remove('hide-toolbar');
+      titleInput.classList.remove('only-title');
     }
+
+    lastScroll = current;
   }
 
-  function playPreviousVideoFromPlaylist(videoWrapper) {
-    if (playlistVideos.length === 0) {
-      return;
-    }
-    currentPlaylistIndex = (currentPlaylistIndex - 1 + playlistVideos.length) % playlistVideos.length;
-    label.textContent = `${currentPlaylistIndex+1}/${playlistVideos.length}`;
-    const previousVideoUrl = playlistVideos[currentPlaylistIndex];
-    const videoId = getVideoId(previousVideoUrl);
-    const iframe = videoWrapper.querySelector('iframe');
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&mute=0`;
-    const slider = videoWrapper.querySelector('.slider');
-    initializeYouTubeAPI(iframe, slider.value);
-    // if (players.indexOf(event.target) === -1) 
-    if (customPlaylist){
-      let newDic = getCookie("customListDic")
-      newDic["currentIndex"]=currentPlaylistIndex
-      setCookie("customListDic",newDic , 10);
-    }
-  }
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  if (subjectsScroll)
+    subjectsScroll.addEventListener('scroll', handleScroll, { passive: true });
 
-  initializeYouTubeAPI(iframe, volume, timeFrame);
-
-  if (customPlaylist)
-    {
-      return
-    }
-  
-  try {
-        var urlDic = getCookie("urlDic");
-        if (urlDic != null){
-          if (!(videoUrl in urlDic)){
-            var urlProperties = {}
-            urlProperties["timeFrame"] = timeFrame
-            urlProperties["volume"] = volume
-            urlDic[videoUrl] = urlProperties
-            setCookie("urlDic", urlDic, 10);
-          }
-        } else{
-          var urlDic = {};
-          var urlProperties = {};
-          urlProperties["volume"] = 1
-          urlProperties["timeFrame"] = 0
-          urlDic[videoUrl] = urlProperties
-          setCookie("urlDic", urlDic, 10);
-          urlDic = getCookie("urlDic");
-        }
-    } catch (error) {
-        alert("An error occurred: " + error);
-    }
-}
-
-
-
-async function addVideo() {
-  const videoUrlInput = document.getElementById('video-url');
-  let videoUrl = videoUrlInput.value.trim();
-
-  if (!videoUrl) {
-    sendWebViewSignal('VIDEO_BROWSE', 'Browse')
-    return; // Exit the function if the video URL is empty
-  }
-
-  await filterLink(videoUrl, 60, 0)
-  videoUrlInput.value = '';
-}
-
-async function addVideoFromNative(videoUrl) {
-  await filterLink(videoUrl, 70, 0)
-  // videoUrlInput.value = '';
-}
-
-
-function getPlaylistVideos(playlistUrl) {
-  return new Promise((resolve, reject) => {
-    const playlistId = new URL(playlistUrl).searchParams.get('list');
-    if (!playlistId) {
-      reject('Invalid playlist URL. Please enter a valid URL with the "list" parameter.');
-      return;}
-    fetchVideosFromPlaylist(playlistId)
-      .then(videoUrls => {
-        resolve(videoUrls);
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
-}
-async function fetchVideosFromPlaylist(playlistId) {
-  const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=AIzaSyDQkRgxuQ7i5-1UuYtuve8eZgAb1-XGe30`);
-  const data = await response.json();
-  const videoUrls = [];
-  for (const item of data.items) {
-    if (item.kind === 'youtube#playlistItem') {
-      const videoId = item.snippet.resourceId.videoId;
-      const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-      videoUrls.push(videoUrl);
-    }
-  }
-  return videoUrls;
-}
-function removeVideo(videoWrapper, videoUrl) {
-  const iframe = videoWrapper.querySelector('iframe');
-  const videoId = iframe.src.split('/').pop().split('?')[0];
-  players = players.filter(player => player.getVideoData().video_id !== videoId);
-  videoWrapper.remove();
-  
-}
-function getVideoId(url) {
-  var regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
-  
-  var match = url.match(regExp);
-
-  if (match && match[1]) {
-    return match[1];
-  } else {
-    regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
-    match = url.match(regExp);
-    if (match && match[1]) {
-      return match[1];
-    } else {
-      // alert("Invalid url")
-      return null;
-    }
-  }
-}
-function setVolume(videoWrapper, volume) {
-  const iframe = videoWrapper.querySelector('iframe');
-  const videoId = iframe.src.split('/').pop().split('?')[0];
-  const player = players.find(player => player.getVideoData().video_id === videoId);
-  if (player) {
-    player.setVolume(volume);
-  }
-}
-function setSpeed(videoWrapper, speed) {
-  const iframe = videoWrapper.querySelector('iframe');
-  const videoId = iframe.src.split('/').pop().split('?')[0];
-  const player = players.find(player => player.getVideoData().video_id === videoId);
-  if (player) {
-    player.setPlaybackRate(parseFloat(speed));
-  }
-}
-function pasteFromClipboard() {
-  
-  try {
-
-    navigator.clipboard.readText()
-    .then(text => {
-      document.getElementById('video-url').value = text.trim();
-    })
-    .catch(err => {
-      console.error('Failed to read clipboard contents: ', err);
-    });
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  
-  try {
-    window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'ClipBoardPlz', title: 'ClipBoardPlz' }));
-  } catch (error){
-    alert(error);
-  }
-}
-
-function setUrlTextField(url) {
-      document.getElementById('video-url').value = url.trim();
-}
-
-document.getElementById('add-video-btn').addEventListener('click', addVideo);
-document.getElementById('paste-btn').addEventListener('click', pasteFromClipboard);
-
-
-
-// Function to send signal to React Native WebView
-function sendWebViewSignal(type_, title_) {
-  try {
-    window.ReactNativeWebView.postMessage(JSON.stringify({ type: type_, title: title_ }));
-  } catch (error) {
-    alert(error);
-  }
-}
-
-
-
-
-
-document.addEventListener("fullscreenchange", () => {
-  const fullscreenElement = document.fullscreenElement;
-  if (fullscreenElement) {
-    sendWebViewSignal('FULL_SCREEN_SIGNAL', 'true');
-  } else {
-    sendWebViewSignal('FULL_SCREEN_SIGNAL', 'false');
-  }
-});
-
-
-
-
-
-
-
-
-
-
-function setCookie(name, value, daysToExpire) {
-  var expirationDate = new Date();
-  expirationDate.setDate(expirationDate.getDate() + daysToExpire);
-  var cookieValue = encodeURIComponent(name) + "=" + encodeURIComponent(JSON.stringify(value)) + "; expires=" + expirationDate.toUTCString() + "; path=/";
-  document.cookie = cookieValue;
-}
-function getCookie(name) {
-  var cookieName = encodeURIComponent(name) + "=";
-  var cookieArray = document.cookie.split(';');
-  for (var i = 0; i < cookieArray.length; i++) {
-    var cookie = cookieArray[i].trim();
-    if (cookie.indexOf(cookieName) === 0) {
-      var cookieValue = cookie.substring(cookieName.length, cookie.length);
-      try {
-        return JSON.parse(decodeURIComponent(cookieValue));
-      } catch (error) {
-        // If parsing fails, return null since we expect a dictionary
-        return null;
-      }
-    }
-  }
-  return null;
-}
-
-
-
-
-const fileInput = document.getElementById('file-input');
-async function addAudioPlayer(url, name, timeFrame=0, volume=0.8) {
-  return new Promise((resolve, reject) => {
-  const videosContainer = document.getElementById('videos-container');
-  const audioContainer = document.createElement('div');
-  audioContainer.classList.add('audio-container');
-  const audioPlayer = document.createElement('audio');
-  audioPlayer.src = url;
-  audioPlayer.controls = false;
-  audioPlayer.loop = false;
-  
-  const playPauseBtn = document.createElement('button');
-  playPauseBtn.classList.add('audio-play-pause');
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  function handlePlay(){
-    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-  }
-  function handlePause(){
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  }
-  function playPauseAudioPlayer(){
-    if (!audioPlayer.paused){
-      audioPlayer.pause();
-    } else {
-      audioPlayer.play();
-    }
-  }
-  
-  playPauseBtn.addEventListener('click', function(){
-    playPauseAudioPlayer()
-  }
-
-  );
-
-  const sliderContainer = document.createElement('div');
-  sliderContainer.classList.add('slider-container');
-
-  const timelineSlider = document.createElement('input');
-  timelineSlider.classList.add('timeline-slider');
-  timelineSlider.type = 'range';
-  timelineSlider.min = '0';
-  timelineSlider.value = '0';
-  timelineSlider.step = '1';
-
-
-  const forwardButton = document.createElement('button');
-  forwardButton.textContent = '+10s';
-  forwardButton.addEventListener('click', () => {
-    audioPlayer.currentTime += 10;
-  });
-
-  
-
-  function toggleLoop() {
-    audioPlayer.loop = !audioPlayer.loop;
-
-    // Toggle icon and update button text based on loop state
-    if (audioPlayer.loop) {
-      loopIcon.classList.remove('fa-solid fa-repeat');
-      loopIcon.classList.add('fa-redo-alt');  // Change icon to signify loop is on
-    } else {
-      loopIcon.classList.remove('fa-redo-alt');
-      loopIcon.classList.add('fa-solid fa-repeat');  // Change icon to signify loop is off
-    }
-  }
-
-
-  
-  const loopBtn = document.createElement('button');
-  const loopIcon = document.createElement('i');
-  loopIcon.className = 'fa-solid fa-repeat'; // Add Font Awesome classes for the menu icon
-  loopBtn.appendChild(loopIcon);
-  
-  loopBtn.addEventListener('click', toggleLoop);
-
-
-
-  const backward30Sec = document.createElement('button');
-  backward30Sec.textContent = '-30s';
-  backward30Sec.addEventListener('click', () => {
-    audioPlayer.currentTime -= 30;
-  });
-
-  const backwardButton = document.createElement('button');
-  backwardButton.textContent = '-10s';
-  backwardButton.addEventListener('click', () => {
-    audioPlayer.currentTime -= 10;
-  });
-
-  const speedSelect = document.createElement('select');
-  [0.5, 0.75, 1, 1.15,1.25, 1.5, 1.75, 2].forEach(speed => {
-    const option = document.createElement('option');
-    option.value = speed;
-    option.textContent = `${speed}x`;
-    speedSelect.appendChild(option);
-  });
-  speedSelect.value = 1
-  speedSelect.addEventListener('change', () => {
-    audioPlayer.playbackRate = speedSelect.value;
-  });
-
-  const volumeContainer = document.createElement('div');
-  volumeContainer.classList.add('volume-container');
-  const speakerIcon = document.createElement('i');
-  speakerIcon.classList.add('fas', 'fa-volume-up', 'volume-icon');
-  volumeContainer.appendChild(speakerIcon);
-  const volumeSlider = document.createElement('input');
-  volumeSlider.type = 'range';
-  volumeSlider.min = 0;
-  volumeSlider.max = 1;
-  volumeSlider.step = 0.01;
-  volumeSlider.value = volume;
-  volumeSlider.classList.add('slider');
-  volumeContainer.appendChild(volumeSlider);
-
-  volumeSlider.addEventListener('input', () => {
-    audioPlayer.volume = volumeSlider.value;
-    var fileDic = getCookie("fileDic");
-    if (fileDic !== null) {
-      if (url in fileDic){
-        let floatValue = parseFloat(volumeSlider.value); // Convert the value to a float
-        let formattedValue = floatValue.toFixed(1); 
-        fileDic[url]["volume"] = formattedValue;
-        setCookie("fileDic", fileDic, 10);
-      } 
+  window.addEventListener('resize', () => {
+    lastScroll = getScroll();
+    if (window.innerWidth > 768) {
+      topbar.classList.remove('collapsed');
+      rightTop.classList.remove('hide-toolbar');
+      overallBox.classList.remove('hide-toolbar');
+      titleInput.classList.remove('only-title');
     }
   });
+}
+/* ==================== END Scroll Hide ==================== */
 
-  const currentTimeLabel = document.createElement('span');
 
-  const durationLabel = document.createElement('span');
-  durationLabel.textContent = '0:0'; // Initialize duration label
+  /* ==================== State and Storage ==================== */
+  const LS_KEY = "study_progress_data_v7";
+  let state = {
+    title: "",
+    subjects: [],
+    settings: {
+      mode: "chapters",
+      defaultColor: "#dbeafe",
+      colors: {
+        low: "#fde8e8",
+        mid: "#fff5cc",
+        high: "#d7f7d7",
+        full: "#a5f3a5",
+      },
+    },
+  };
+  let currentlySwipedRow = null; 
 
-  
-  // Helper function to format time in MM:SS format
-  const formatTime = (timeInSeconds) => {
-    const hours = Math.floor(timeInSeconds / 3600);
-    const minutes = Math.floor((timeInSeconds % 3600) / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
+  const $ = (id) => document.getElementById(id);
+  const subjectTpl = document.getElementById("subjectTpl");
+  const chapterTpl = document.getElementById("chapterTpl");
+  const subjectsContainer = $("subjectsContainer");
 
-    const formattedHours = hours > 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
-    const formattedMinutes = `${minutes < 10 ? '0' : ''}${minutes}`;
-    const formattedSeconds = `${seconds < 10 ? '0' : ''}${seconds}`;
+  const idGen = (p = "id") => `${p}_${Date.now()}_${Math.floor(Math.random() * 9999)}`;
+  const chapterCompleted = (ch) => ch.goal > 0 && ch.solved >= ch.goal;
 
-    return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
-};
-  audioPlayer.addEventListener('timeupdate', () => {
-    currentTimeLabel.textContent = formatTime(audioPlayer.currentTime);
-    timelineSlider.value = audioPlayer.currentTime; 
-    timelineSlider.max = audioPlayer.duration;
-    durationLabel.textContent = `${formatTime(audioPlayer.duration)}`;
-    var fileDic = getCookie("fileDic");
-    if (fileDic !== null) {
-      if (url in fileDic){
-        fileDic[url]["timeFrame"] = audioPlayer.currentTime;
-        setCookie("fileDic", fileDic, 10);
-      } 
-    }
+
+  function colorForPercent(p) {
+    const c = state.settings.colors;
+    if (p >= 100) return c.full;
+    if (p >= 67) return c.high;
+    if (p >= 34) return c.mid;
+    return c.low;
   }
-);
 
-  audioPlayer.addEventListener('loadedmetadata', () => {
+  /* ==================== Save Indicator ==================== */
+  const saveIndicator = (() => {
+    const el = document.createElement("div");
+    el.id = "saveIndicator";
+    el.textContent = "💾 Saved";
+    document.body.appendChild(el);
+    return {
+      show() {
+        el.classList.add("visible");
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => el.classList.remove("visible"), 1500);
+      },
+    };
+  })();
 
-  var fileDic = getCookie("fileDic");
-  if (fileDic !== null && fileDic[url] !== undefined) {
-      audioPlayer.currentTime = fileDic[url]["timeFrame"];
-      audioPlayer.volume = fileDic[url]["volume"];
-    }
-  });
-  // audioPlayer.addEventListener('ended', () => {
+  function save() {
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    saveIndicator.show();
+  }
 
-  //   alert("audio stoped")
-  // });
-
-  audioPlayer.addEventListener('error', (e) => {
-    console.error('Failed to load audio:', e.message);
-});
-  timelineSlider.addEventListener('input', () => {
-    audioPlayer.currentTime = timelineSlider.value;
-  });
-  audioPlayer.addEventListener('play', handlePlay);
-  audioPlayer.addEventListener('pause', handlePause);
-  const volumeControlerContainer = document.createElement('div');
-  volumeControlerContainer.classList.add('volumeControlerContainer');
-  const otherAudioControllersContainer = document.createElement('div');
-  otherAudioControllersContainer.classList.add('otherAudioControllersContainer');
-  sliderContainer.appendChild(timelineSlider);
-  
-  const audioControls = document.createElement('div');
-  audioControls.classList.add('audio-controls');
-  const timeLabelContainer = document.createElement('div');
-  timeLabelContainer.classList.add('timelabelContainer');
-  timeLabelContainer.appendChild(currentTimeLabel);
-  timeLabelContainer.appendChild(durationLabel);
-  sliderContainer.appendChild(timeLabelContainer)
-  otherAudioControllersContainer.appendChild(playPauseBtn);
-  otherAudioControllersContainer.appendChild(backwardButton);
-  otherAudioControllersContainer.appendChild(forwardButton);
-  otherAudioControllersContainer.appendChild(loopBtn);
-  otherAudioControllersContainer.appendChild(speedSelect);
-  volumeControlerContainer.appendChild(volumeContainer);
-  audioControls.appendChild(otherAudioControllersContainer);
-  audioControls.appendChild(volumeControlerContainer);
-  const audioFileLabel = document.createElement('label');
-  audioFileLabel.textContent = name;
-  audioFileLabel.classList.add('AudioFileName');
-  const removeButton = document.createElement('button');
-  removeButton.textContent = '❌';
-  removeButton.classList.add('remove-btn');
-  removeButton.addEventListener('click', function () {
-    audioContainer.remove();
-    fileInput.value = '';
-
+  function load() {
     try {
-      var fileDic = getCookie("fileDic");
-      if (fileDic !== null) {
-        if (url in fileDic) {
-          delete fileDic[url]
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) state = JSON.parse(raw);
+    } catch (e) {
+      console.warn("Load error:", e);
+    }
+  }
 
-          if (Object.keys(fileDic).length == 0){
-            deleteCookie("fileDic");
-          }else{
-            setCookie("fileDic", fileDic, 10);
+  /* ==================== Calculations ==================== */
+  function subjectPercent(subj) {
+    const chapters = subj.parts.flatMap(p => p.chapters);
+    if (!chapters.length) return 0;
+    const done = chapters.filter(chapterCompleted).length;
+    return Math.round((done / chapters.length) * 100);
+  }
+
+  function overallStats() {
+    const chapters = state.subjects.flatMap(s => s.parts.flatMap(p => p.chapters));
+    const total = chapters.length;
+    const done = chapters.filter(chapterCompleted).length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    return { pct, summary: `Completed ${done}/${total} chapters` };
+  }
+
+  function playSound(audio) {
+            audio.valume = 0.8;
+            audio.pause();
+            audio.currentTime = 0;
+            audio.play().catch(e => console.warn("Audio playback blocked:", e)); 
           }
-        }
-      }
-  } catch (error) {
-      alert("An error occurred: " + error);
-  }
-  });
+          
+  /* ==================== Rendering ==================== */
+  function render() {
+    subjectsContainer.innerHTML = "";
 
-
-
-  const MenuButton = document.createElement('button');
-  MenuButton.className = 'MenuButton-class';
-  const icon = document.createElement('i');
-  icon.className = 'fas fa-bars'; // Add Font Awesome classes for the menu icon
-  MenuButton.appendChild(icon);
-
-
-
-  
-// Create the dropdown menu
-const menu = document.createElement('div');
-menu.className = 'dropdown-menu';
-menu.style.display = 'none'; // Hide the menu initially
-
-// Add menu items
-const menuItems = [
-  { text: 'Set Pause Timer', iconClass: 'fas fa-pause' },
-  { text: 'Copy Link', iconClass: 'fas fa-copy' }
-];
-menuItems.forEach(item => {
-  const menuItem = document.createElement('div');
-  menuItem.className = 'menu-item';
-
-  // Create and append the icon
-  const menuIcon = document.createElement('i');
-  menuIcon.className = item.iconClass;
-  menuIcon.style.marginRight = '10px'; // Add spacing between icon and text
-  menuItem.appendChild(menuIcon);
-
-  // Add text content
-  menuItem.appendChild(document.createTextNode(item.text));
-
-  // Add click functionality
-  menuItem.addEventListener('click', () => {
-    // alert(`You clicked: ${item.text}`);
-    if (item.text == 'Set Pause Timer'){
-      const timeInSeconds = prompt('Enter the time in seconds to pause:');
-
-  // Validate the input
-  if (timeInSeconds && !isNaN(timeInSeconds) && timeInSeconds > 0) {
-    
-    setTimeout(() => {
-      audioPlayer.pause(); 
-      }, timeInSeconds * 1000); 
-    
-    alert(`Player will pause in ${timeInSeconds} seconds.`);
-    
-    
-  } else {
-    alert('Invalid input. Please enter a valid number.');
-  }
+    if (!state.subjects.length) {
+      subjectsContainer.innerHTML = `<div class="empty-note">No subjects yet — click "＋ Subject" to add one.</div>`;
+      updateOverall();
+      return;
     }
 
-    menu.style.display = 'none'; // Hide the menu after clicking
-  });
+    state.subjects.forEach((subj) => {
+      const node = subjectTpl.content.cloneNode(true);
+      const sEl = node.querySelector(".subject");
+      const header = sEl.querySelector(".subject-header");
 
-  menu.appendChild(menuItem);
-});
+      // Subject color
+      header.style.background = subj.color || state.settings.defaultColor;
 
-// Append the menu to the document body
-document.body.appendChild(menu);
+      // Subject name
+      const nameEl = sEl.querySelector(".subject-name");
+      nameEl.textContent = subj.name || "New Subject";
+      nameEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") e.preventDefault(), nameEl.blur();
+      });
+      nameEl.addEventListener("blur", () => {
+        subj.name = nameEl.textContent.trim();
+        save();
+      });
 
-// Toggle menu visibility on button click
-MenuButton.addEventListener('click', (e) => {
-  // Prevent click from propagating to the document
-  e.stopPropagation();
+      // Color picker
+      const colorInp = sEl.querySelector(".subject-color");
+      colorInp.value = subj.color || state.settings.defaultColor;
+      colorInp.addEventListener("input", (e) => {
+        header.style.background = e.target.value;
+      });
+      colorInp.addEventListener("change", (e) => {
+        subj.color = e.target.value;
+        save();
+        render();
+      });
 
-  // Toggle menu visibility
-  if (menu.style.display === 'none' || menu.style.display === '') {
-    // Position the menu relative to the button
-    const rect = MenuButton.getBoundingClientRect();
-    menu.style.top = `${rect.bottom + window.scrollY}px`;
-    menu.style.left = `${rect.left + window.scrollX}px`;
-    menu.style.display = 'block';
-  } else {
-    menu.style.display = 'none';
-  }
-});
+      // Progress
+      const spct = subjectPercent(subj);
+      const fill = sEl.querySelector(".subject-progress-fill");
+      fill.style.width = spct + "%";
+      fill.style.background = "#60a5fa";
+      sEl.querySelector(".subject-pct").textContent = spct + "%";
 
-// Hide the menu when clicking outside
-document.addEventListener('click', () => {
-  menu.style.display = 'none';
-});
+      // Add & remove part
+      sEl.querySelector(".add-part").onclick = () => {
+        subj.parts.push({ id: idGen("part"), name: "New Part", chapters: [] });
+        save();
+        render();
+      };
+      sEl.querySelector(".remove-subject").onclick = () => {
+        if (!confirm("Delete this subject?")) return;
+        state.subjects = state.subjects.filter(x => x.id !== subj.id);
+        save();
+        render();
+      };
 
-// Prevent the menu from hiding when clicking inside it
-menu.addEventListener('click', (e) => {
-  e.stopPropagation();
-});
+      // Parts
+      const partsRow = sEl.querySelector(".parts-row");
+      partsRow.innerHTML = "";
+      subj.parts.forEach((part, pIdx) => {
+        const col = document.createElement("div");
+        col.className = "part-col";
+
+        const pHeader = document.createElement("div");
+        pHeader.className = "part-header";
+        const pName = document.createElement("div");
+        pName.className = "part-name";
+        pName.textContent = part.name;
+        pName.contentEditable = true;
+        pName.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") e.preventDefault(), pName.blur();
+        });
+        pName.addEventListener("blur", () => {
+          part.name = pName.textContent.trim();
+          save();
+        });
+
+        const pActions = document.createElement("div");
+        pActions.className = "part-actions";
+        const addCh = document.createElement("button");
+        addCh.textContent = "+ Chapter";
+        addCh.className = "small";
+        addCh.onclick = () => {
+          part.chapters.push({
+            id: idGen("chap"),
+            name: "New Chapter",
+            goal: 100,
+            solved: 0,
+            checked: false,
+          });
+          save();
+          render();
+        };
+        const delPart = document.createElement("button");
+        delPart.textContent = "Delete";
+        delPart.className = "small danger";
+        delPart.onclick = () => {
+          if (!confirm("Delete this part?")) return;
+          subj.parts.splice(pIdx, 1);
+          save();
+          render();
+        };
+        pActions.append(addCh, delPart);
+        pHeader.append(pName, pActions);
+        col.appendChild(pHeader);
+
+        const chList = document.createElement("div");
+        chList.className = "chapters-list";
+        part.chapters.forEach((ch, cIdx) => {
+          const crow = chapterTpl.content.cloneNode(true);
+          const row = crow.querySelector(".chapter-row");
+
+          const p = ch.goal ? Math.round((ch.solved / ch.goal) * 100) : 0;
+          row.style.background = colorForPercent(p);
+
+          const chk = row.querySelector(".chap-check");
+          chk.checked = !!ch.checked;
+          chk.onchange = () => {
+            ch.checked = chk.checked;
+            if (chk.checked) {
+              ch.solved = ch.goal;
+              playSound( new Audio('positive.wav'));
+            }
+            else ch.solved = 0;
+            save();
+            render();
+          };
+
+          const cname = row.querySelector(".chap-name");
+          cname.textContent = ch.name;
+          cname.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") e.preventDefault(), cname.blur();
+          });
+          cname.addEventListener("blur", () => {
+            ch.name = cname.textContent.trim();
+            save();
+          });
+
+          const goalSpan = row.querySelector(".goal-value");
+          goalSpan.textContent = ch.goal || 0;
+          goalSpan.addEventListener("dblclick", () => {
+            const val = prompt("Set new goal:", ch.goal);
+            if (val === null) return;
+            const n = parseInt(val);
+            if (!isNaN(n)) {
+              ch.goal = n;
+              if (ch.solved > ch.goal) ch.solved = ch.goal;
+              save();
+              render();
+            }
+          });
 
 
 
+          let touchTimer;
+          let touchTimer2;
+          goalSpan.addEventListener('dblclick', () => openGoalPrompt());
+          goalSpan.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            openGoalPrompt();
+          });
+          goalSpan.addEventListener('touchstart', () => {
+            touchTimer = setTimeout(() => openGoalPrompt(), 800);
+          });
+          goalSpan.addEventListener('touchend', () => clearTimeout(touchTimer));
+          goalSpan.addEventListener('touchmove', () => clearTimeout(touchTimer));
+          goalSpan.addEventListener('touchcancel', () => clearTimeout(touchTimer));
 
-  const removeContainer = document.createElement('div');
-  removeContainer.classList.add('remove-container');
-  removeContainer.appendChild(MenuButton)
-  removeContainer.appendChild(audioFileLabel)
-  removeContainer.appendChild(removeButton)
+          function openGoalPrompt() {
+            const val = prompt("Set goal (e.g. 100 MCQs)", ch.goal || 0);
+            if (val === null) return;
+            const n = parseInt(val);
+            if (!isNaN(n)) {
+              ch.goal = n;
+              if (ch.solved > ch.goal) ch.solved = ch.goal;
+              if (ch.solved >= ch.goal) ch.checked = true;
+              goalSpan.textContent = ch.goal;
+              save();
+              render();
+            }
+          }
+          const prog = row.querySelector(".chap-progress .fill");
+          prog.style.width = p + "%";
+          prog.style.background = "#60a5fa";
+          row.querySelector(".chap-progress span").textContent = p + "%";
 
+          const solvedSpan = row.querySelector(".solved-value");
+          solvedSpan.textContent = ch.solved;          
+          const incBtn = document.createElement("button");
+          incBtn.textContent = "＋";
+          incBtn.className = "solved-inc small";
+          
+          solvedSpan.addEventListener('contextmenu', e => {
+            e.preventDefault();
+          });
 
-  audioContainer.appendChild(removeContainer);
-  audioContainer.appendChild(sliderContainer);
-  audioContainer.appendChild(audioPlayer);
-  audioContainer.appendChild(audioControls);
-  videosContainer.appendChild(audioContainer);
-
-
-  try {
-    var fileDic = getCookie("fileDic");
-    if (fileDic !== null) {
-      if (!(url in fileDic)) {  
-      var urlProperties = {}
-      urlProperties["name"] = name
-      urlProperties["timeFrame"] = timeFrame
-      urlProperties["volume"] = volume
-      fileDic[url] = urlProperties
-      setCookie("fileDic", keepLastFiveElements(fileDic), 10);
-      }
-    } else{
-      var fileDic = {};
-      var urlProperties = {};
-      urlProperties["name"] = name
-      urlProperties["timeFrame"] = timeFrame
-      urlProperties["volume"] = volume
-      fileDic[url] = urlProperties
-      setCookie("fileDic", fileDic, 10);
-    }
-
-  } catch (error) {
-    alert("An error occurred: " + error);
-  }
-  resolve();
-})
-}
-
-
-async function filterLink(videoUrl, volume, timeFrame) {
-  return new Promise((resolve, reject) => {
-    if (videoUrl.includes(",")){
-      let splitedUrls = videoUrl.split(", ")
-      addVideoPlayer(splitedUrls[0], volume, speed, true, splitedUrls, timeFrame,0, true); // No need to pass isPlaylist=true
-      
-      let customListDic = {}
-      customListDic["urls"] = splitedUrls
-      customListDic["currentIndex"] = 0
-      customListDic["volume"] = 100
-
-
-      setCookie("customListDic", customListDic, 10);
-      
-
-      resolve();
-    }
-    else {
-      addVideoPlayer(videoUrl, volume, speed,false, [], timeFrame);
-      resolve(); 
-    }
-  });
-}
-
-document.getElementById('clear-button').addEventListener('click', function() {
-    document.getElementById('video-url').value = '';
-});
-
-
-function deleteCookie(name) {
-  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-}
-// fileInput.addEventListener('change', function(event) {
-//   const file = event.target.files[0];
-
-//   if (file) {
-//     const url = URL.createObjectURL(file);
-//     try {
-//       window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'SELECTED_FILE_URL', state: url }));
-//     } catch (error){
-//       console.log(error)
-//     }
-    
-//     const name = file.name
-//       if (file.type.startsWith('audio/')) {
+          solvedSpan.addEventListener('touchstart', () => {
+            touchTimer2 = setTimeout(() => openSolvedPrompt(), 800);
+          });
+          solvedSpan.addEventListener('touchend', () => clearTimeout(touchTimer2));
+          solvedSpan.addEventListener('touchmove', () => clearTimeout(touchTimer2));
+          solvedSpan.addEventListener('touchcancel', () => clearTimeout(touchTimer2));
           
 
-//         let timeFrame = 0
-//         let volume = 0
-        
-//         var fileDic = getCookie("fileDic");
-//         if (fileDic != null) {
-//           for (let savedUrl in fileDic){
-//             if (savedUrl == url || name == fileDic[savedUrl]["name"])
-//               timeFrame = fileDic[savedUrl]["timeFrame"];
-//               volume = fileDic[savedUrl]["volume"];
-//             // addAudioPlayer(url, fileDic[url]["name"], fileDic[url]["timeFrame"], fileDic[url]["volume"]);
-//           }
-//         }
-//         addAudioPlayer(url, name, timeFrame, volume);
-//       }
-//   }
-// });
-
-
-
-fileInput.addEventListener('change', function(event) {
-  const files = event.target.files;
-
-  if (files.length > 0) {
-    for (const file of files) {
-      const url = URL.createObjectURL(file);
-      
-      try {
-        window.ReactNativeWebView.postMessage(JSON.stringify({ 
-          type: 'SELECTED_FILE_URL', 
-          state: url 
-        }));
-      } catch (error) {
-        console.log(error);
-      }
-
-      const name = file.name;
-      if (file.type.startsWith('audio/')) {
-        let timeFrame = 0;
-        let volume = 0;
-
-        const fileDic = getCookie("fileDic");
-        if (fileDic != null) {
-          for (let savedUrl in fileDic) {
-            if (savedUrl == url || name == fileDic[savedUrl]["name"]) {
-              timeFrame = fileDic[savedUrl]["timeFrame"];
-              volume = fileDic[savedUrl]["volume"];
+          function openSolvedPrompt() {
+            const val = prompt("Set solved (e.g. 100 MCQs)", ch.solved || 0);
+            if (val === null) return;
+            const n = parseInt(val);
+            if (!isNaN(n)) {
+              ch.solved = n;
+              if (ch.solved > ch.goal) ch.solved = ch.goal;
+              if (ch.solved >= ch.goal) {
+                ch.checked = true;
+                playSound(new Audio('positive.wav'));
+              }
+              solvedSpan.textContent = ch.solved;
+              save();
+              render();
             }
           }
-        }
-        addAudioPlayer(url, name, timeFrame, volume);
-      }
-    }
-  }
-});
+          incBtn.onclick = () => {
+  ch.solved++;
+  if (ch.solved > ch.goal) ch.solved = ch.goal;
+
+  playSound(new Audio('correct.wav'));
+
+  // Add animation class
+  incBtn.classList.add("animate");
+
+  // Remove class after animation ends
+  incBtn.addEventListener("animationend", () => {
+    incBtn.classList.remove("animate");
+  }, { once: true });
+
+  // Delay render slightly so animation is visible
+  setTimeout(() => {
+    save();
+    render();
+  }, 300); // match your CSS animation duration
+};
 
 
+          const decBtn = document.createElement("button");
+          decBtn.textContent = "−";
+          decBtn.className = "solved-dec small";
+          decBtn.onclick = () => {
+            ch.solved = Math.max(0, ch.solved - 1);
+            save();
+            render();
+          };
 
-function keepLastFiveElements(obj) {
-  let entries = Object.entries(obj);
-  if (entries.length > 5) {
-      entries = entries.slice(-5);
-  }
-  return Object.fromEntries(entries);
-}
-
-async function initFunc() {
-  try{
-  var urlDic = getCookie("urlDic");
-    if (urlDic !== null) {
-      for (let url in urlDic) {
-        try {
-          await filterLink(url, urlDic[url]["volume"], urlDic[url]["timeFrame"]); 
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    };
-    // var fileDic = getCookie("fileDic");
-    // if (fileDic != null) {
-    //   for (let url in fileDic){
-    //     await addAudioPlayer(url, fileDic[url]["name"], fileDic[url]["timeFrame"], fileDic[url]["volume"]);
-
-    //   }
-    // }
-
-    var customListDic = getCookie("customListDic");
-    if (customListDic !== null) {
-      addVideoPlayer(customListDic["urls"][customListDic["currentIndex"]], volume, speed, true, customListDic["urls"], 0, customListDic["currentIndex"], customPlaylist=true); // No need to pass isPlaylist=true
-      
-      // let customListDic = {}
-      // customListDic["urls"] = splitedUrls
-      // customListDic["currentIndex"] = 0
-      // customListDic["volume"] = 100
-      
-    };
-  }catch (error) {
-    console.error('An error occurred during initialization:', error);
-  }
-}
-initFunc().then(() => {
-  console.log('Initialization completed.');
-}).catch(error => {
-  console.error('Initialization failed:', error);
-});
+          row.querySelector(".chap-solved").append(incBtn, decBtn);
+          
+          row.querySelector(".del-ch").onclick = () => {
+            if (!confirm("Delete this chapter?")) return;
+            part.chapters.splice(cIdx, 1);
+            save();
+            render();
+          };
 
 
+          chList.appendChild(row);
+        });
 
-
-
-  const Clipcheckbox = document.getElementById('trackCheckbox');
-  const clipboardTextField = document.getElementById('clipboardTextField');
-  let previousClipboard = '';
-
-  Clipcheckbox.addEventListener('change', function() {
-    if (this.checked) {
-     
-
- navigator.clipboard.writeText('').then(() => {
-        previousClipboard = '';
-        trackClipboard();
+        col.appendChild(chList);
+        partsRow.appendChild(col);
       });
-    } else {
-      previousClipboard = '';
-    }
+
+      sEl.appendChild(partsRow);
+      subjectsContainer.appendChild(sEl);
+    });
+
+    updateOverall();
+  }
+
+  function updateOverall() {
+    const { pct, summary } = overallStats();
+    $("overallPct").textContent = pct + "%";
+    $("overallBar").querySelector(".progress-fill").style.width = pct + "%";
+    $("overallSummary").textContent = summary;
+  }
+
+  /* ==================== Buttons ==================== */
+  $("btnAddSubject").onclick = () => {
+    const subj = {
+      id: idGen("subj"),
+      name: "New Subject",
+      color: state.settings.defaultColor,
+      parts: [
+        { id: idGen("part"), name: "Part 1", chapters: [] },
+        { id: idGen("part"), name: "Part 2", chapters: [] },
+      ],
+    };
+    state.subjects.push(subj);
+    save();
+    render();
+  };
+
+  $("btnClear").onclick = () => {
+    if (!confirm("Clear all data?")) return;
+    state.subjects = [];
+    save();
+    render();
+  };
+
+  $("btnExport").onclick = () => {
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "study_progress.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  $("btnImport").onclick = () => $("importFile").click();
+  $("importFile").onchange = (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        if (!confirm("Importing will replace your current data. Continue?")) return;
+        state = parsed;
+        save();
+        render();
+        $("titleInput").value = state.title || "";
+      } catch {
+        alert("Invalid JSON file");
+      }
+    };
+    reader.readAsText(f);
+  };
+
+  /* ==================== Title Save ==================== */
+  $("titleInput").addEventListener("blur", () => {
+    state.title = $("titleInput").value.trim();
+    save();
   });
 
+  /* ==================== Init ==================== */
+  load();
+  $("titleInput").value = state.title || "";
+  render();
+})();
 
-
-
-
-  
-
-    </script>
-  </div>
+   </script>
 </body>
 </html>
-
