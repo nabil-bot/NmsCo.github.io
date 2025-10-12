@@ -269,7 +269,9 @@ if (topbar && rightTop && overallBox && titleInput) {
           const crow = chapterTpl.content.cloneNode(true);
           const row = crow.querySelector(".chapter-row");
 
-          const p = ch.goal ? Math.round((ch.solved / ch.goal) * 100) : 0;
+          // const p = ch.goal ? Math.round((ch.solved / ch.goal) * 100) : 0;
+            const p = ch.goal ? parseFloat(((ch.solved / ch.goal) * 100).toFixed(2)) : 0;
+
           row.style.background = colorForPercent(p);
 
           const chk = row.querySelector(".chap-check");
@@ -378,25 +380,26 @@ if (topbar && rightTop && overallBox && titleInput) {
             }
           }
           incBtn.onclick = () => {
-  ch.solved++;
-  if (ch.solved > ch.goal) ch.solved = ch.goal;
+            ch.solved++;
+            if (ch.solved > ch.goal) ch.solved = ch.goal;
 
-  playSound(new Audio('correct.wav'));
+          
+            // Add animation class
+            incBtn.classList.add("animate");
 
-  // Add animation class
-  incBtn.classList.add("animate");
+            // Remove class after animation ends
+            incBtn.addEventListener("animationend", () => {
+              incBtn.classList.remove("animate");
+            }, { once: true });
 
-  // Remove class after animation ends
-  incBtn.addEventListener("animationend", () => {
-    incBtn.classList.remove("animate");
-  }, { once: true });
+            // Delay render slightly so animation is visible
+            setTimeout(() => {
+              save();
+              render();
+              playSound(new Audio('correct.wav'));
+            }, 300); // match your CSS animation duration
 
-  // Delay render slightly so animation is visible
-  setTimeout(() => {
-    save();
-    render();
-  }, 300); // match your CSS animation duration
-};
+          };
 
 
           const decBtn = document.createElement("button");
@@ -431,6 +434,9 @@ if (topbar && rightTop && overallBox && titleInput) {
 
     updateOverall();
   }
+  // render finish ===============
+
+
 
   function updateOverall() {
     const { pct, summary } = overallStats();
