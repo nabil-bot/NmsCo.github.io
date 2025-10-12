@@ -309,13 +309,24 @@ button.small {
   transition: width 0.25s ease;
 }
 
-.chap-progress span {
+/* .chap-progress span {
   position: absolute;
   top: -1.125rem;
   right: 0.125rem;
   font-size: 0.6875rem;
   color: #475569;
+} */
+
+.chap-progress {
+  position: relative;
+  height: 0.75rem; /* slightly taller for better readability */
+  border-radius: 9999px;
+  overflow: hidden;
+  background: #e5e7eb;
 }
+
+
+
 
 /* ========= Side Panel (Right) ========= */
 .side-panel {
@@ -665,18 +676,44 @@ button.small {
     background: #e2e8f0;
     border-radius: 9999px;
     overflow: hidden;
-    margin-top: 0.25rem;
+    /* margin-top: 0.25rem; */
+    align-items: center;
+    justify-content: center;
   }
 
-  .chap-progress .fill {
+  /* .chap-progress .fill {
     height: 100%;
     transition: width 0.3s ease;
     background: var(--accent);
-  }
+  } */
+
+
+  .chap-progress .fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.25s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+  /* .chap-progress span {
+    display: none; 
+  } */
 
   .chap-progress span {
-    display: none; /* hide % label on small screens to save space */
-  }
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #4c5770; /* dark text for contrast */
+  text-shadow: 0 0 2px rgba(255,255,255,0.6); /* subtle for visibility */
+  pointer-events: none;
+}
 
   .chapter-row .del-ch {
     grid-area: del;
