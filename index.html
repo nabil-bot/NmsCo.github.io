@@ -6,10 +6,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Study Progress — Fullscreen Sheet</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bangla:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <!-- <link rel="stylesheet" href="styles.css" /> -->
+  <link rel="stylesheet" href="styles.css" />
 
   <style>
-
     /* ========= Base ========= */
 :root {
   --font: "Noto Sans Bangla", "Noto Sans Bengali", sans-serif;
@@ -321,13 +320,24 @@ button.small {
   transition: width 0.25s ease;
 }
 
-.chap-progress span {
+/* .chap-progress span {
   position: absolute;
   top: -1.125rem;
   right: 0.125rem;
   font-size: 0.6875rem;
   color: #475569;
+} */
+
+.chap-progress {
+  position: relative;
+  height: 0.75rem; /* slightly taller for better readability */
+  border-radius: 9999px;
+  overflow: hidden;
+  background: #e5e7eb;
 }
+
+
+
 
 /* ========= Side Panel (Right) ========= */
 .side-panel {
@@ -677,18 +687,44 @@ button.small {
     background: #e2e8f0;
     border-radius: 9999px;
     overflow: hidden;
-    margin-top: 0.25rem;
+    /* margin-top: 0.25rem; */
+    align-items: center;
+    justify-content: center;
   }
 
-  .chap-progress .fill {
+  /* .chap-progress .fill {
     height: 100%;
     transition: width 0.3s ease;
     background: var(--accent);
-  }
+  } */
+
+
+  .chap-progress .fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.25s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+  /* .chap-progress span {
+    display: none; 
+  } */
 
   .chap-progress span {
-    display: none; /* hide % label on small screens to save space */
-  }
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #4c5770; /* dark text for contrast */
+  text-shadow: 0 0 2px rgba(255,255,255,0.6); /* subtle for visibility */
+  pointer-events: none;
+}
 
   .chapter-row .del-ch {
     grid-area: del;
@@ -920,6 +956,8 @@ button.small {
   100% { transform: scale(1); }
 }
   </style>
+
+
 </head>
 <body>
   <div id="app">
@@ -1046,9 +1084,9 @@ button.small {
     </template>
 <template id="chapterTpl">
   <div class="chapter-row">
-    <div class="delete-swipe-btn" title="Swipe to delete">
+    <!-- <div class="delete-swipe-btn" title="Swipe to delete">
         🗑
-    </div>
+    </div> -->
 
     <div class="chapter-content">
       <input class="chap-check" type="checkbox" title="mark complete"/>
@@ -1066,7 +1104,6 @@ button.small {
   </div>
   <!-- <script src="app.js" defer></script> -->
    <script>
-
     (() => {
   /* ==================== Scroll Hide for Toolbar (Mobile Only) ==================== */
   /* ==================== Scroll Hide for Toolbar (Mobile Only) ==================== */
@@ -1338,7 +1375,9 @@ if (topbar && rightTop && overallBox && titleInput) {
           const crow = chapterTpl.content.cloneNode(true);
           const row = crow.querySelector(".chapter-row");
 
-          const p = ch.goal ? Math.round((ch.solved / ch.goal) * 100) : 0;
+          // const p = ch.goal ? Math.round((ch.solved / ch.goal) * 100) : 0;
+            const p = ch.goal ? parseFloat(((ch.solved / ch.goal) * 100).toFixed(2)) : 0;
+
           row.style.background = colorForPercent(p);
 
           const chk = row.querySelector(".chap-check");
@@ -1447,25 +1486,26 @@ if (topbar && rightTop && overallBox && titleInput) {
             }
           }
           incBtn.onclick = () => {
-  ch.solved++;
-  if (ch.solved > ch.goal) ch.solved = ch.goal;
+            ch.solved++;
+            if (ch.solved > ch.goal) ch.solved = ch.goal;
 
-  playSound(new Audio('correct.wav'));
+          
+            // Add animation class
+            incBtn.classList.add("animate");
 
-  // Add animation class
-  incBtn.classList.add("animate");
+            // Remove class after animation ends
+            incBtn.addEventListener("animationend", () => {
+              incBtn.classList.remove("animate");
+            }, { once: true });
 
-  // Remove class after animation ends
-  incBtn.addEventListener("animationend", () => {
-    incBtn.classList.remove("animate");
-  }, { once: true });
+            // Delay render slightly so animation is visible
+            setTimeout(() => {
+              save();
+              render();
+              playSound(new Audio('correct.wav'));
+            }, 300); // match your CSS animation duration
 
-  // Delay render slightly so animation is visible
-  setTimeout(() => {
-    save();
-    render();
-  }, 300); // match your CSS animation duration
-};
+          };
 
 
           const decBtn = document.createElement("button");
@@ -1500,6 +1540,9 @@ if (topbar && rightTop && overallBox && titleInput) {
 
     updateOverall();
   }
+  // render finish ===============
+
+
 
   function updateOverall() {
     const { pct, summary } = overallStats();
@@ -1575,5 +1618,5 @@ if (topbar && rightTop && overallBox && titleInput) {
 })();
 
    </script>
-</body>
+  </body>
 </html>
