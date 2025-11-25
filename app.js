@@ -1,6 +1,4 @@
 (() => {
-  /* ==================== Scroll Hide for Toolbar (Mobile Only) ==================== */
-  /* ==================== Scroll Hide for Toolbar (Mobile Only) ==================== */
 const topbar = document.querySelector('.topbar');
 const rightTop = document.querySelector('.right-top');
 const overallBox = document.getElementById('overallBox');
@@ -92,13 +90,38 @@ if (topbar && rightTop && overallBox && titleInput) {
   const chapterCompleted = (ch) => ch.goal > 0 && ch.solved >= ch.goal;
 
 
-  function colorForPercent(p) {
-    const c = state.settings.colors;
-    if (p >= 100) return c.full;
-    if (p >= 67) return c.high;
-    if (p >= 34) return c.mid;
-    return c.low;
+/* ==================== Custom Color Gradient ==================== */
+
+// Function to smoothly transition from Red (0) to Green (120) using HSL
+// p: percentage (0 to 100)
+function getColorShade(p) {
+  // Ensure percentage is clamped between 0 and 100
+  const percent = Math.max(0, Math.min(100, p));
+  
+  // Hue ranges from Red (0) to Green (120). 
+  // We reverse the range so 0% is Red (0) and 100% is Green (120).
+  const hue = percent * 1.2; // 120 / 100 = 1.2
+  
+  // Set a constant Saturation and Lightness for a pastel/light shade (you can adjust these)
+  const saturation = 70; // %
+  let lightness = 85; // % - adjusted to be a light shade for better text contrast
+  
+  // Optionally: Make the background slightly darker for 100% completion
+  if (percent >= 100) {
+      lightness = 75; 
   }
+
+  // Use the calculated hue, saturation, and lightness to return an HSL color string
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+
+// Modified colorForPercent to use the gradient function
+function colorForPercent(p) {
+  // The color change is based on every 5% progression, so we don't need to segment it.
+  // The gradient function handles the smooth transition based on the actual percentage.
+  return getColorShade(p);
+}
 
   /* ==================== Save Indicator ==================== */
   const saveIndicator = (() => {
