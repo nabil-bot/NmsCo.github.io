@@ -1,45 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
+
+<!doctype html>
+<html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <title>Simple Video Player</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    input {
-      padding: 8px;
-      font-size: 14px;
-    }
-    video {
-      flex: 1;
-      width: 100%;
-      background: black;
-    }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Study Progress — Fullscreen Sheet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bangla:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div id="app">
+    <header class="topbar">
+      <div class="left-top">
+        <input id="titleInput" class="title-input" placeholder="ড্যাশবোর্ড শিরোনাম লিখুন..." />
+        <button id="btnSettings" class="icon-btn" title="Settings">⚙</button>
+      </div>
+      <div id="overallBox" class="card overall-box">
+          <div class="overall-row">
+            <div id="overallSummary" class="muted small">Overall Progress:</div>
+            <div id="overallPct" class="big-pct">0%</div>
+          </div>
+          <div class="progress-wrap">
+            <div id="overallBar" class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      <div class="right-top">
+        <button id="btnAddSubject" class="primary">＋ Subject</button>
+        <button id="btnExport">Export</button>
+        <button id="btnImport">Import</button>
+        <input id="importFile" type="file" accept="application/json" style="display:none"/>
+        <button id="btnClear" class="danger">Clear</button>
+      </div>
+    </header>
+    <main class="main-full">
+      <section id="subjectsContainer" class="subjects-container">
+        <div class="empty-note">No subjects yet — click "＋ Subject" to add one.</div>
+      </section>
+      <aside class="side-panel">
+        <div id="settingsPanel" class="settings-panel hidden">
+          <div class="settings-header">
+            <h3>Settings</h3>
+            <button id="closeSettings" class="icon-btn">✕</button>
+          </div>
+          <div class="settings-body">
+            <div class="setting-row">
+              <label>Overall progress mode</label>
+              <select id="calcMode">
+                <option value="chapters">A — By chapter count (completed / total)</option>
+                <option value="goals">B — By goals (sum solved / sum goals)</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label>Default subject color</label>
+              <input id="defaultColor" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color (0–33%)</label>
+              <input id="colorLow" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color (34–66%)</label>
+              <input id="colorMid" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color (67–99%)</label>
+              <input id="colorHigh" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color (100%)</label>
+              <input id="colorFull" type="color" />
+            </div>
+            <div class="setting-row">
+              <label>Chapter color intensity</label>
+              <select id="colorIntensity">
+                <option value="light">Light (good text contrast)</option>
+                <option value="normal">Normal</option>
+              </select>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+              <button id="saveSettings" class="primary small">Save</button>
+              <button id="resetColors" class="small">Reset</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
 
-  <input
-    id="videoUrl"
-    placeholder="Paste video URL (mp4, webm...)"
-  />
+    <!-- templates (not visible) -->
+    <template id="subjectTpl">
+      <div class="subject card">
+        <div class="subject-header">
+          <div class="left">
+            <div class="color-picker-wrap">
+              <input class="subject-color" type="color" title="Subject color"/>
+            </div>
+            <div class="subject-name name" contenteditable="true" spellcheck="false">নতুন বিষয়</div>
+          </div>
+          <div class="right">
+            <div class="subject-pct small muted">0%</div>
+            <button class="add-part small">＋ Part</button>
+            <button class="remove-subject small danger">Delete</button>
+          </div>
+        </div>
 
-  <video id="player" controls></video>
+        <div class="subject-progress-wrap">
+          <div class="subject-progress-bar"><div class="subject-progress-fill" style="width:0%"></div></div>
+        </div>
 
-  <script>
-    const input = document.getElementById("videoUrl");
-    const video = document.getElementById("player");
-
-    input.addEventListener("change", () => {
-      video.src = input.value;
-      video.play();
-    });
-  </script>
-
-</body>
+        <div class="parts-row">
+          <div class="part-col">
+            <div class="part-header">
+              <div class="part-name name" contenteditable="true" spellcheck="false">Part 1</div>
+              <div class="part-actions">
+                <button class="add-chapter small">＋ Chapter</button>
+                <button class="remove-part small danger">Delete</button>
+              </div>
+            </div>
+            <div class="chapters-list"></div>
+          </div>
+          <div class="part-col">
+            <div class="part-header">
+              <div class="part-name name" contenteditable="true" spellcheck="false">Part 2</div>
+              <div class="part-actions">
+                <button class="add-chapter small">＋ Chapter</button>
+                <button class="remove-part small danger">Delete</button>
+              </div>
+            </div>
+            <div class="chapters-list"></div>
+          </div>
+        </div>
+      </div>
+    </template>
+<template id="chapterTpl">
+  <div class="chapter-row">
+    <div class="chapter-content">
+      <input class="chap-check" type="checkbox" title="mark complete"/>
+      <div class="chap-name name" contenteditable="true" spellcheck="false">Chapter</div>
+      <div class="chap-goal small muted">Goal: <span class="goal-value">0</span></div>
+      <div class="chap-solved small muted">Solved: <span class="solved-value">0</span>
+      </div>
+      <div class="chap-progress"><div class="fill" style="width:0%"></div><span>0%</span></div>
+      <div class="chap-actions">
+        <button class="del-ch small danger">X</button>
+      </div>
+    </div>
+  </div>
+</template>
+  </div>
+  <script src="app.js" defer></script>
+  </body>
 </html>
